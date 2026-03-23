@@ -88,9 +88,13 @@ ik_persistence <- function(x,
         val <- 0
       } else {
         # Companion form polynomial roots
+        # polyroot gives roots of the characteristic polynomial z^p - phi_1 z^{p-1} - ...
+        # The "largest root" persistence measure is the inverse of the smallest
+        # root modulus, i.e. the largest eigenvalue of the companion matrix.
+        # This gives a value in [0,1] for stationary processes.
         poly_coefs <- c(1, -ar_coefs)
         roots <- polyroot(poly_coefs)
-        val <- max(Mod(roots))
+        val <- 1 / min(Mod(roots))
       }
       list(value = val, ar_coefficients = ar_coefs)
     }

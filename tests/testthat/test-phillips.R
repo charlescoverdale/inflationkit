@@ -102,6 +102,44 @@ test_that("robust_se option works", {
   expect_equal(length(pc_ols$std_errors), length(pc_rob$std_errors))
 })
 
+test_that("HAC standard errors produce different results from OLS", {
+  # Generate data with autocorrelated errors
+  set.seed(42)
+  n <- 100
+  slack <- rnorm(n, 0, 1)
+  # AR(1) errors induce autocorrelation
+  e <- numeric(n)
+  e[1] <- rnorm(1)
+  for (t in 2:n) e[t] <- 0.7 * e[t - 1] + rnorm(1)
+  inflation <- 2 - 0.5 * slack + e
+
+  pc_ols <- ik_phillips(inflation, slack, type = "traditional",
+                        lags = 1L, robust_se = FALSE)
+  pc_hac <- ik_phillips(inflation, slack, type = "traditional",
+                        lags = 1L, robust_se = "HAC")
+
+  # HAC SEs should differ from OLS SEs
+  expect_true(is.numeric(pc_hac$std_errors))
+  expect_false(all(abs(pc_ols$std_errors - pc_hac$std_errors) < 1e-10))
+})
+
+test_that("robust_se = TRUE still works (backward compatibility)", {
+  data <- ik_sample_data("headline")
+  pc <- ik_phillips(data$inflation, data$unemployment,
+                    type = "traditional", robust_se = TRUE)
+  expect_s3_class(pc, "ik_phillips")
+  expect_true(is.numeric(pc$std_errors))
+})
+
+test_that("robust_se = 'HC1' gives same results as robust_se = TRUE", {
+  data <- ik_sample_data("headline")
+  pc_true <- ik_phillips(data$inflation, data$unemployment,
+                         type = "traditional", robust_se = TRUE)
+  pc_hc1 <- ik_phillips(data$inflation, data$unemployment,
+                         type = "traditional", robust_se = "HC1")
+  expect_equal(pc_true$std_errors, pc_hc1$std_errors, tolerance = 1e-10)
+})
+
 test_that("type is stored correctly", {
   data <- ik_sample_data("headline")
   pc <- ik_phillips(data$inflation, data$unemployment, type = "traditional")

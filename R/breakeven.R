@@ -4,6 +4,10 @@
 #' (inflation-linked) bond yields. This provides a market-based measure of
 #' inflation expectations.
 #'
+#' Note: breakeven inflation is a simplified measure that does not account for
+#' inflation risk premium or liquidity premium. It should be interpreted as a
+#' rough proxy for inflation expectations, not a precise measure.
+#'
 #' @param nominal_yield Numeric vector. Nominal bond yields.
 #' @param real_yield Numeric vector. Real (inflation-linked) bond yields, same
 #'   length as `nominal_yield`.

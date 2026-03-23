@@ -96,40 +96,88 @@ ik_trend <- function(x,
   list(trend = as.numeric(trend), lambda = lambda, window = NULL, alpha = NULL)
 }
 
-#' Beveridge-Nelson decomposition
+#' Beveridge-Nelson decomposition (Morley 2002)
+#'
+#' Computes the BN trend by fitting an AR(p) to first differences and
+#' calculating expected future cumulative changes via the companion form.
 #' @noRd
 .trend_bn <- function(x) {
   n <- length(x)
 
-  # Fit AR model (order by BIC)
-  p <- .select_ar_order(x, max_order = min(12L, n - 3L), ic = "bic")
-  ar_coefs <- .fit_ar(x, p)
+  # Step 1: Compute first differences
+  dx <- diff(x)
+  n_dx <- length(dx)
+
+  # Step 2: Fit AR(p) to first differences (select p by BIC)
+  p <- .select_ar_order(dx, max_order = min(12L, n_dx - 3L), ic = "bic")
 
   if (p == 0L) {
-    # No dynamics; trend = cumulative sum of mean
-    trend <- rep(mean(x), n)
+    # No dynamics in differences: trend is a random walk, cycle is zero
+    trend <- x
     return(list(trend = trend, lambda = NULL, window = NULL, alpha = NULL))
   }
 
-  # BN trend: tau_t = x_t + sum of expected future changes
-  # For AR(p): long-run impact = 1 / (1 - sum(phi))
+  ar_coefs <- .fit_ar(dx, p)
+
+  # Step 3: Check for unit root in differences (sum of AR coefs near 1)
   sum_phi <- sum(ar_coefs)
-
   if (abs(1 - sum_phi) < 1e-10) {
-    # Unit root case: trend follows a random walk
     trend <- x
-  } else {
-    # BN decomposition: trend = x + psi(1)^{-1} * cumulative revision
-    # Simplified: compute AR residuals, accumulate
-    resid <- .ar_residuals(x, ar_coefs)
-    long_run <- 1 / (1 - sum_phi)
+    return(list(trend = trend, lambda = NULL, window = NULL, alpha = NULL))
+  }
 
-    # Pad residuals to match x length
-    resid_full <- c(rep(0, p), resid)
+  # Step 4: Build companion form matrix A (p x p)
+  A <- matrix(0, nrow = p, ncol = p)
+  A[1, ] <- ar_coefs
+  if (p > 1L) {
+    for (i in 2:p) {
+      A[i, i - 1L] <- 1
+    }
+  }
 
-    # BN trend = x + long_run multiplier * cumulative adjustment
-    cum_resid <- cumsum(resid_full)
-    trend <- x - (long_run - 1) * resid_full
+  # Step 5: Compute (I - A)^{-1} A for expected future cumulative change
+  I_p <- diag(p)
+  ImA_inv <- solve(I_p - A)
+  G <- ImA_inv %*% A  # G maps state vector to expected future cumulative change
+
+  # e1 selects the first element: expected_change = e1' G s_t
+  # which equals G[1, ] %*% s_t
+
+  # Step 6: Get residuals from the AR fit on differences
+  resid_dx <- .ar_residuals(dx, ar_coefs)
+
+  # Step 7: Compute BN trend for each time point
+  trend <- rep(NA_real_, n)
+
+  # We need p lagged residuals to form the state vector.
+  # Residuals are available from index (p+1) of dx onward.
+  # That corresponds to original series indices (p+2) onward.
+  # For earlier indices, use NA.
+
+  # Pad residuals: resid_dx corresponds to dx[(p+1):n_dx], i.e. x[(p+2):n]
+  # We need residuals aligned to dx indices
+  resid_full <- rep(NA_real_, n_dx)
+  resid_full[(p + 1L):n_dx] <- resid_dx
+
+  for (t in seq_len(n)) {
+    # t indexes x[t]; corresponding dx index is t-1 (dx[t-1] = x[t] - x[t-1])
+    # State vector at time t uses dx residuals at dx indices (t-1), (t-2), ..., (t-p)
+    dx_idx <- t - 1L  # most recent dx index
+    if (dx_idx < p) {
+      trend[t] <- NA_real_
+      next
+    }
+
+    # Build state vector: [resid at dx_idx, resid at dx_idx-1, ..., resid at dx_idx-p+1]
+    state_indices <- dx_idx:(dx_idx - p + 1L)
+    if (any(state_indices < 1L) || any(is.na(resid_full[state_indices]))) {
+      trend[t] <- NA_real_
+      next
+    }
+
+    s_t <- resid_full[state_indices]
+    expected_cum_change <- sum(G[1, ] * s_t)
+    trend[t] <- x[t] + expected_cum_change
   }
 
   list(trend = as.numeric(trend), lambda = NULL, window = NULL, alpha = NULL)

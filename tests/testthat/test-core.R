@@ -88,6 +88,46 @@ test_that("trimmed_mean errors for invalid trim", {
   expect_error(ik_core(data, method = "trimmed_mean", trim = -0.1))
 })
 
+test_that("asymmetric_trim with known data gives expected result", {
+  # 5 equal-weight items, sorted price changes
+  df <- data.frame(
+    date = rep(as.Date("2020-01-01"), 5),
+    item = c("A", "B", "C", "D", "E"),
+    weight = rep(0.2, 5),
+    price_change = c(0.01, 0.02, 0.03, 0.04, 0.05),
+    stringsAsFactors = FALSE
+  )
+  # Trim lower 20%, upper 20% => keep middle 60% (items B, C, D)
+  core <- ik_core(df, method = "asymmetric_trim",
+                  trim_lower = 0.2, trim_upper = 0.2)
+  # With equal weights, result should be mean of B, C, D
+  expected <- mean(c(0.02, 0.03, 0.04))
+  expect_equal(core$core$core_inflation, expected, tolerance = 0.01)
+})
+
+test_that("asymmetric_trim with Dallas Fed defaults runs", {
+  data <- ik_sample_data("components")
+  core <- ik_core(data, method = "asymmetric_trim")
+  expect_s3_class(core, "ik_core")
+  expect_equal(core$method, "asymmetric_trim")
+  expect_equal(core$trim_lower, 0.24)
+  expect_equal(core$trim_upper, 0.31)
+})
+
+test_that("weight normalization warning is issued when weights do not sum to 1", {
+  df <- data.frame(
+    date = rep(as.Date("2020-01-01"), 3),
+    item = c("A", "B", "C"),
+    weight = c(0.6, 0.8, 0.6),  # sum = 2.0
+    price_change = c(0.01, 0.02, 0.03),
+    stringsAsFactors = FALSE
+  )
+  expect_warning(
+    ik_core(df, method = "trimmed_mean"),
+    "Weights do not sum to 1"
+  )
+})
+
 test_that("ik_core validates missing columns", {
   df <- data.frame(date = Sys.Date(), item = "A")
   expect_error(ik_core(df))

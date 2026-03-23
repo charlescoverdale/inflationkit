@@ -97,8 +97,13 @@ wm <- ik_core(d, method = "weighted_median")
 # Exclusion: remove food and energy
 ex <- ik_core(d, method = "exclusion", exclude = c("Food", "Transport"))
 
-# Compare all three
-comp <- ik_compare(tm, wm, ex, labels = c("Trimmed mean", "Weighted median", "Ex food & transport"))
+# Asymmetric trim: Dallas Fed style (24% lower, 31% upper)
+at <- ik_core(d, method = "asymmetric_trim")
+
+# Compare all four
+comp <- ik_compare(tm, wm, ex, at,
+                   labels = c("Trimmed mean", "Weighted median",
+                              "Ex food & transport", "Asymmetric trim"))
 plot(comp)
 ```
 
@@ -130,6 +135,10 @@ pc
 #> * Slope: -0.12 (p = 0.03)
 #> * R-squared: 0.45
 #> * Observations: 76
+
+# With Newey-West HAC standard errors (robust to serial correlation)
+pc_hac <- ik_phillips(d$inflation, d$output_gap, type = "traditional",
+                      lags = 4, robust_se = "HAC")
 
 plot(pc)  # Scatter plot with fitted line
 ```
@@ -207,7 +216,7 @@ Or use the built-in sample data: `ik_sample_data("components")`.
 | Function | Description |
 |----------|-------------|
 | `ik_decompose()` | Weighted contributions of CPI components to headline |
-| `ik_core()` | Core inflation (trimmed mean, weighted median, exclusion) |
+| `ik_core()` | Core inflation (trimmed mean, weighted median, exclusion, asymmetric trim) |
 | `ik_sticky_flexible()` | Sticky vs flexible price decomposition |
 | `ik_persistence()` | Inflation persistence (sum of AR, half-life, largest root) |
 | `ik_diffusion()` | Diffusion index (fraction of items with rising prices) |

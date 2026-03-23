@@ -1,3 +1,30 @@
+# inflationkit 0.2.0
+
+## Bug fixes
+
+* Fixed `ik_persistence(method = "largest_root")` to return values in [0,1] for
+  stationary processes.
+* Rewrote `ik_trend(method = "beveridge_nelson")` to correctly implement the BN
+  decomposition (Morley 2002): fits AR to first differences and uses companion
+  form matrix.
+* Added weight normalization in `ik_decompose()` so weights that don't sum to 1
+  are handled correctly.
+
+## New features
+
+* Dallas Fed asymmetric trimmed mean via `ik_core(method = "asymmetric_trim")`
+  with `trim_lower` and `trim_upper` parameters (defaults: 24% lower, 31%
+  upper).
+* Newey-West HAC standard errors for Phillips curve via
+  `ik_phillips(robust_se = "HAC")` with automatic bandwidth selection.
+* Weight normalization warning in `ik_core()` when weights don't sum to
+  approximately 1.
+
+## Documentation
+
+* Added note to `ik_breakeven()` about inflation risk premium and liquidity
+  premium limitations.
+
 # inflationkit 0.1.0
 
 * Initial release.

@@ -70,6 +70,30 @@ test_that("ik_decompose preserves number of rows", {
   expect_equal(nrow(decomp$contributions), nrow(data))
 })
 
+test_that("weight normalization: weights summing to 2 give same headline as weights summing to 1", {
+  df1 <- data.frame(
+    date = rep(as.Date("2020-01-01"), 3),
+    item = c("A", "B", "C"),
+    weight = c(0.5, 0.3, 0.2),
+    price_change = c(0.02, 0.04, -0.01),
+    stringsAsFactors = FALSE
+  )
+  df2 <- data.frame(
+    date = rep(as.Date("2020-01-01"), 3),
+    item = c("A", "B", "C"),
+    weight = c(1.0, 0.6, 0.4),  # doubled weights (sum = 2)
+    price_change = c(0.02, 0.04, -0.01),
+    stringsAsFactors = FALSE
+  )
+  decomp1 <- ik_decompose(df1)
+  decomp2 <- ik_decompose(df2)
+  expect_equal(
+    decomp1$headline$headline_inflation,
+    decomp2$headline$headline_inflation,
+    tolerance = 1e-10
+  )
+})
+
 test_that("ik_decompose validates missing columns", {
   df <- data.frame(date = Sys.Date(), item = "A", weight = 0.5)
   expect_error(ik_decompose(df))

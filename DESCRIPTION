@@ -1,6 +1,6 @@
 Package: inflationkit
 Title: Inflation Decomposition, Core Measures, and Trend Estimation
-Version: 0.1.0
+Version: 0.2.0
 Authors@R:
     person("Charles", "Coverdale", , "charlesfcoverdale@gmail.com", role = c("aut", "cre"))
 Description: Tools for analysing inflation dynamics. Computes weighted

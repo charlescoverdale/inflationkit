@@ -49,6 +49,20 @@ test_that("largest_root works", {
   expect_true(p$value >= 0)
 })
 
+test_that("largest_root returns value in [0,1] for stationary AR(1)", {
+  set.seed(42)
+  n <- 500
+  rho <- 0.8
+  x <- numeric(n)
+  x[1] <- 0
+  for (t in 2:n) x[t] <- rho * x[t - 1] + rnorm(1, 0, 1)
+
+  p <- ik_persistence(x, method = "largest_root", ar_order = 1L)
+  # For a stationary AR(1), largest root should be close to rho and in [0,1]
+  expect_true(p$value >= 0 && p$value <= 1)
+  expect_equal(p$value, rho, tolerance = 0.1)
+})
+
 test_that("ar_order is selected automatically when NULL", {
   data <- ik_sample_data("headline")
   p <- ik_persistence(data$inflation, method = "sum_ar", ar_order = NULL)

@@ -92,6 +92,38 @@ test_that("beveridge_nelson works", {
   expect_length(tr$trend, length(data$inflation))
 })
 
+test_that("BN decomposition: trend of random walk is close to series itself", {
+  set.seed(42)
+  n <- 200
+  # Pure random walk: differences are i.i.d.
+  x <- cumsum(rnorm(n, 0, 1))
+  tr <- ik_trend(x, method = "beveridge_nelson")
+
+  # For a random walk, BN trend should be very close to the series
+  # (cycle should be small)
+  non_na <- !is.na(tr$trend)
+  expect_true(sum(non_na) > n / 2)  # most values should be non-NA
+  cycle_sd <- sd(tr$cycle[non_na])
+  series_sd <- sd(x[non_na])
+  # Cycle volatility should be much smaller than the series itself
+
+  expect_true(cycle_sd < series_sd)
+})
+
+test_that("BN decomposition: trend + cycle = original for non-NA values", {
+  data <- ik_sample_data("headline")
+  tr <- ik_trend(data$inflation, method = "beveridge_nelson")
+
+  non_na <- !is.na(tr$trend)
+  expect_true(any(non_na))
+  # trend + cycle should equal original
+  expect_equal(
+    tr$trend[non_na] + tr$cycle[non_na],
+    tr$original[non_na],
+    tolerance = 1e-10
+  )
+})
+
 test_that("method is stored correctly", {
   x <- rnorm(50)
   expect_equal(ik_trend(x, method = "hp")$method, "hp")

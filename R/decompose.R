@@ -41,11 +41,20 @@ ik_decompose <- function(data,
     stringsAsFactors = FALSE
   )
 
+  # Normalise weights within each date group so they sum to 1
+  dates <- unique(df$date)
+  for (d in dates) {
+    idx <- df$date == d
+    w_sum <- sum(df$weight[idx])
+    if (w_sum > 0) {
+      df$weight[idx] <- df$weight[idx] / w_sum
+    }
+  }
+
   # Compute contributions
   df$contribution <- df$weight * df$price_change
 
   # Compute headline
-  dates <- unique(df$date)
   headline_vals <- vapply(dates, function(d) {
     sum(df$contribution[df$date == d])
   }, numeric(1))

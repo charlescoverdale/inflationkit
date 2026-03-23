@@ -29,6 +29,11 @@ Calculates breakeven inflation as the spread between nominal and real
 (inflation-linked) bond yields. This provides a market-based measure of
 inflation expectations.
 }
+\details{
+Note: breakeven inflation is a simplified measure that does not account for
+inflation risk premium or liquidity premium. It should be interpreted as a
+rough proxy for inflation expectations, not a precise measure.
+}
 \examples{
 # Breakeven term structure
 be <- ik_breakeven(

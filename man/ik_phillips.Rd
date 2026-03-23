@@ -29,8 +29,11 @@ same length as \code{inflation}.}
 \item{lags}{Integer. Number of lagged inflation terms to include. Default
 \code{4}.}
 
-\item{robust_se}{Logical. If \code{TRUE}, compute HC1 heteroskedasticity-robust
-standard errors. Default \code{FALSE}.}
+\item{robust_se}{Logical or character. If \code{FALSE}, use OLS standard errors.
+If \code{TRUE} or \code{"HC1"}, compute HC1 heteroskedasticity-robust standard
+errors. If \code{"HAC"}, compute Newey-West heteroskedasticity and
+autocorrelation consistent standard errors with automatic bandwidth
+selection (Newey and West, 1994). Default \code{FALSE}.}
 }
 \value{
 An S3 object of class \code{"ik_phillips"} with elements:

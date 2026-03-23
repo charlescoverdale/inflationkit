@@ -6,8 +6,10 @@
 \usage{
 ik_core(
   data,
-  method = c("trimmed_mean", "weighted_median", "exclusion"),
+  method = c("trimmed_mean", "weighted_median", "exclusion", "asymmetric_trim"),
   trim = 0.08,
+  trim_lower = 0.24,
+  trim_upper = 0.31,
   exclude = NULL,
   date_col = "date",
   item_col = "item",
@@ -18,11 +20,19 @@ ik_core(
 \arguments{
 \item{data}{A data.frame containing component-level inflation data.}
 
-\item{method}{Character. One of \code{"trimmed_mean"}, \code{"weighted_median"}, or
-\code{"exclusion"}.}
+\item{method}{Character. One of \code{"trimmed_mean"}, \code{"weighted_median"},
+\code{"exclusion"}, or \code{"asymmetric_trim"}.}
 
 \item{trim}{Numeric. Fraction to trim from each tail (for \code{"trimmed_mean"}
 only). Default \code{0.08} (8\% symmetric trim, following the Cleveland Fed).}
+
+\item{trim_lower}{Numeric. Fraction to trim from the lower tail (for
+\code{"asymmetric_trim"} only). Default \code{0.24}, matching the Dallas Fed
+trimmed mean PCE.}
+
+\item{trim_upper}{Numeric. Fraction to trim from the upper tail (for
+\code{"asymmetric_trim"} only). Default \code{0.31}, matching the Dallas Fed
+trimmed mean PCE.}
 
 \item{exclude}{Character vector. Items to exclude (for \code{"exclusion"} only).}
 

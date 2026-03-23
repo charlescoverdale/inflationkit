@@ -14,8 +14,11 @@
 #'   `"expectations_augmented"`, or `"hybrid"`.
 #' @param lags Integer. Number of lagged inflation terms to include. Default
 #'   `4`.
-#' @param robust_se Logical. If `TRUE`, compute HC1 heteroskedasticity-robust
-#'   standard errors. Default `FALSE`.
+#' @param robust_se Logical or character. If `FALSE`, use OLS standard errors.
+#'   If `TRUE` or `"HC1"`, compute HC1 heteroskedasticity-robust standard
+#'   errors. If `"HAC"`, compute Newey-West heteroskedasticity and
+#'   autocorrelation consistent standard errors with automatic bandwidth
+#'   selection (Newey and West, 1994). Default `FALSE`.
 #'
 #' @return An S3 object of class `"ik_phillips"` with elements:
 #' \describe{
@@ -106,9 +109,18 @@ ik_phillips <- function(inflation,
   summ <- summary(fit)
 
   # Standard errors
-  if (robust_se) {
+  # Backward compatibility: TRUE maps to "HC1"
+  if (is.logical(robust_se)) {
+    robust_se <- if (robust_se) "HC1" else FALSE
+  }
+
+  if (identical(robust_se, "HC1")) {
     se <- .hc1_se(fit)
-    # Recompute t-stats and p-values
+    coefs <- coef(fit)
+    t_stats <- coefs / se
+    p_vals <- 2 * pt(abs(t_stats), df = fit$df.residual, lower.tail = FALSE)
+  } else if (identical(robust_se, "HAC")) {
+    se <- .hac_se(fit)
     coefs <- coef(fit)
     t_stats <- coefs / se
     p_vals <- 2 * pt(abs(t_stats), df = fit$df.residual, lower.tail = FALSE)
@@ -153,6 +165,39 @@ ik_phillips <- function(inflation,
   bread <- solve(crossprod(X))
 
   V <- hc1_factor * bread %*% meat %*% bread
+  se <- sqrt(diag(V))
+  names(se) <- names(coef(fit))
+  se
+}
+
+#' Newey-West HAC standard errors (no external dependency)
+#'
+#' Uses Bartlett kernel with automatic bandwidth selection following
+#' Newey and West (1994): floor(4 * (n / 100)^(2/9)).
+#' @noRd
+.hac_se <- function(fit) {
+  X <- model.matrix(fit)
+  e <- residuals(fit)
+  n <- length(e)
+  k <- ncol(X)
+
+  # Automatic bandwidth (Newey-West 1994 plug-in)
+  L <- floor(4 * (n / 100)^(2 / 9))
+
+  # Compute S = sum of weighted autocovariance matrices (Bartlett kernel)
+  # Gamma_0
+  S <- crossprod(X * e)
+
+  for (j in seq_len(L)) {
+    w_j <- 1 - j / (L + 1)  # Bartlett kernel weight
+    # Gamma_j = sum_{t=j+1}^{n} (e_t * x_t) (e_{t-j} * x_{t-j})'
+    Gamma_j <- crossprod(X[(j + 1):n, , drop = FALSE] * e[(j + 1):n],
+                         X[1:(n - j), , drop = FALSE] * e[1:(n - j)])
+    S <- S + w_j * (Gamma_j + t(Gamma_j))
+  }
+
+  bread <- solve(crossprod(X))
+  V <- bread %*% S %*% bread
   se <- sqrt(diag(V))
   names(se) <- names(coef(fit))
   se
