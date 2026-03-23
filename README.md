@@ -175,16 +175,25 @@ dm
 
 ## What data do I need?
 
-Most functions take a data frame with CPI components. Each row is one item in one period:
+Most functions take a data frame with CPI components. Each row is one item in one period. The default column names are `date`, `item`, `weight`, and `price_change`:
 
 | Column | What it is |
 |--------|-----------|
 | `date` | Date of the observation (e.g. `2024-01-01`) |
 | `item` | Component name (e.g. `"Food"`, `"Housing"`, `"Transport"`) |
-| `weight` | CPI basket weight as a proportion (0.15 = 15%). Should sum to 1 within each date. |
-| `price_change` | Period-on-period price change as a decimal (0.003 = 0.3% monthly inflation) |
+| `weight` | CPI basket weight as a proportion (0.15 = 15%). Should sum to 1 within each date. If they do not, functions normalise them internally. |
+| `price_change` | Period-on-period price change as a decimal (0.003 = 0.3% monthly inflation). Positive means prices are rising. |
 
-Some functions (`ik_persistence`, `ik_phillips`, `ik_trend`) take a simple numeric vector of headline inflation rates instead.
+If your data uses different column names, every function has `date_col`, `item_col`, `weight_col`, and `change_col` arguments so you can map them:
+
+```r
+# Your data has columns: month, category, share, pct_change
+ik_decompose(my_data,
+             date_col = "month", item_col = "category",
+             weight_col = "share", change_col = "pct_change")
+```
+
+Some functions (`ik_persistence`, `ik_phillips`, `ik_trend`, `ik_forecast_eval`) take simple numeric vectors instead of a data frame.
 
 ### Option 1: Use the built-in sample data
 
