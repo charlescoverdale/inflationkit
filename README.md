@@ -252,4 +252,6 @@ Found a bug or have a feature request? Open an issue at <https://github.com/char
 
 ---
 
+## Keywords
+
 r, r-package, inflation, cpi, core-inflation, trimmed-mean, weighted-median, phillips-curve, macroeconomics, monetary-policy, price-index, beveridge-nelson, inflation-persistence
