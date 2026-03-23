@@ -237,12 +237,12 @@ The methods implemented in this package are based on:
 
 ## Related packages
 
-| Package | Description | CRAN |
-|---------|-------------|------|
-| [inflateR](https://github.com/charlescoverdale/inflateR) | Adjust monetary values for inflation | [![CRAN](https://www.r-pkg.org/badges/version/inflateR)](https://cran.r-project.org/package=inflateR) |
-| [ons](https://github.com/charlescoverdale/ons) | UK Office for National Statistics data (includes CPI) | [![CRAN](https://www.r-pkg.org/badges/version/ons)](https://cran.r-project.org/package=ons) |
-| [fred](https://github.com/charlescoverdale/fred) | Federal Reserve Economic Data (includes US CPI) | [![CRAN](https://www.r-pkg.org/badges/version/fred)](https://cran.r-project.org/package=fred) |
-| [readecb](https://github.com/charlescoverdale/readecb) | European Central Bank data (includes HICP) | [![CRAN](https://www.r-pkg.org/badges/version/readecb)](https://cran.r-project.org/package=readecb) |
+| Package | Description |
+|---------|-------------|
+| [inflateR](https://github.com/charlescoverdale/inflateR) | Adjust monetary values for inflation |
+| [ons](https://github.com/charlescoverdale/ons) | UK Office for National Statistics data (includes CPI) |
+| [fred](https://github.com/charlescoverdale/fred) | Federal Reserve Economic Data (includes US CPI) |
+| [readecb](https://github.com/charlescoverdale/readecb) | European Central Bank data (includes HICP) |
 
 ---
 
