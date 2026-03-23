@@ -44,7 +44,8 @@ ik_compare <- function(..., labels = NULL) {
       switch(m$method,
         trimmed_mean = paste0("Trimmed Mean (", m$trim * 100, "%)"),
         weighted_median = "Weighted Median",
-        exclusion = paste0("Exclusion (", paste(m$exclude, collapse = ", "), ")")
+        exclusion = paste0("Exclusion (", paste(m$exclude, collapse = ", "), ")"),
+        asymmetric_trim = paste0("Asymmetric Trim (", m$trim_lower * 100, "%-", m$trim_upper * 100, "%)")
       )
     }, character(1))
   }

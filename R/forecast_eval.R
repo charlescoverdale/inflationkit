@@ -30,6 +30,7 @@
 #'
 #' @export
 #' @examples
+#' set.seed(42)
 #' data <- ik_sample_data("headline")
 #' actual <- data$inflation[5:80]
 #' forecast1 <- data$inflation[4:79] + rnorm(76, 0, 0.2)

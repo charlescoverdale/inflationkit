@@ -7,6 +7,7 @@
 ik_trend(
   x,
   method = c("hp", "beveridge_nelson", "exponential_smooth", "moving_average"),
+  frequency = c("quarterly", "monthly", "annual"),
   lambda = NULL,
   window = NULL
 )
@@ -17,12 +18,17 @@ ik_trend(
 \item{method}{Character. One of \code{"hp"}, \code{"beveridge_nelson"},
 \code{"exponential_smooth"}, or \code{"moving_average"}.}
 
+\item{frequency}{Character. Data frequency: \code{"quarterly"} (default),
+\code{"monthly"}, or \code{"annual"}. Used to set the HP filter lambda (when
+\code{lambda = NULL}) and moving average window (when \code{window = NULL}).}
+
 \item{lambda}{Numeric or \code{NULL}. Smoothing parameter for the HP filter. If
-\code{NULL}, defaults to 1600 for quarterly data (length <= 200) or 14400 for
-monthly data.}
+\code{NULL}, defaults based on \code{frequency}: 6.25 for annual, 1600 for
+quarterly (Hodrick and Prescott, 1997), or 14400 for monthly
+(Backus and Kehoe, 1992).}
 
 \item{window}{Integer or \code{NULL}. Window size for the moving average method.
-Defaults to 4 for quarterly or 12 for monthly.}
+Defaults to 4 for quarterly, 12 for monthly, or 3 for annual.}
 }
 \value{
 An S3 object of class \code{"ik_trend"} with elements:
@@ -50,4 +56,13 @@ plot(tr)
 
 tr_ma <- ik_trend(data$inflation, method = "moving_average", window = 4)
 print(tr_ma)
+}
+\references{
+Hodrick, R. J. and Prescott, E. C. (1997). "Postwar U.S. Business Cycles:
+An Empirical Investigation." Journal of Money, Credit and Banking, 29(1),
+1-16.
+
+Ravn, M. O. and Uhlig, H. (2002). "On Adjusting the Hodrick-Prescott
+Filter for the Frequency of Observations." Review of Economics and
+Statistics, 84(2), 371-376.
 }

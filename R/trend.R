@@ -7,11 +7,15 @@
 #' @param x Numeric vector. An inflation time series.
 #' @param method Character. One of `"hp"`, `"beveridge_nelson"`,
 #'   `"exponential_smooth"`, or `"moving_average"`.
+#' @param frequency Character. Data frequency: `"quarterly"` (default),
+#'   `"monthly"`, or `"annual"`. Used to set the HP filter lambda (when
+#'   `lambda = NULL`) and moving average window (when `window = NULL`).
 #' @param lambda Numeric or `NULL`. Smoothing parameter for the HP filter. If
-#'   `NULL`, defaults to 1600 for quarterly data (length <= 200) or 14400 for
-#'   monthly data.
+#'   `NULL`, defaults based on `frequency`: 6.25 for annual, 1600 for
+#'   quarterly (Hodrick and Prescott, 1997), or 14400 for monthly
+#'   (Backus and Kehoe, 1992).
 #' @param window Integer or `NULL`. Window size for the moving average method.
-#'   Defaults to 4 for quarterly or 12 for monthly.
+#'   Defaults to 4 for quarterly, 12 for monthly, or 3 for annual.
 #'
 #' @return An S3 object of class `"ik_trend"` with elements:
 #' \describe{
@@ -25,6 +29,15 @@
 #'   \item{original}{Numeric vector. The original series.}
 #' }
 #'
+#' @references
+#' Hodrick, R. J. and Prescott, E. C. (1997). "Postwar U.S. Business Cycles:
+#' An Empirical Investigation." Journal of Money, Credit and Banking, 29(1),
+#' 1-16.
+#'
+#' Ravn, M. O. and Uhlig, H. (2002). "On Adjusting the Hodrick-Prescott
+#' Filter for the Frequency of Observations." Review of Economics and
+#' Statistics, 84(2), 371-376.
+#'
 #' @export
 #' @examples
 #' data <- ik_sample_data("headline")
@@ -37,9 +50,11 @@
 ik_trend <- function(x,
                      method = c("hp", "beveridge_nelson",
                                 "exponential_smooth", "moving_average"),
+                     frequency = c("quarterly", "monthly", "annual"),
                      lambda = NULL,
                      window = NULL) {
   method <- match.arg(method)
+  frequency <- match.arg(frequency)
   validate_numeric_vector(x, "x")
   n <- length(x)
 
@@ -48,10 +63,10 @@ ik_trend <- function(x,
   }
 
   result <- switch(method,
-    hp = .trend_hp(x, lambda),
+    hp = .trend_hp(x, lambda, frequency),
     beveridge_nelson = .trend_bn(x),
     exponential_smooth = .trend_es(x),
-    moving_average = .trend_ma(x, window)
+    moving_average = .trend_ma(x, window, frequency)
   )
 
   structure(
@@ -70,12 +85,15 @@ ik_trend <- function(x,
 
 #' HP filter: solve (I + lambda * K'K)^{-1} x
 #' @noRd
-.trend_hp <- function(x, lambda) {
+.trend_hp <- function(x, lambda, frequency) {
   n <- length(x)
 
   if (is.null(lambda)) {
-    # Heuristic: quarterly if n <= 200, monthly otherwise
-    lambda <- if (n <= 200) 1600 else 14400
+    lambda <- switch(frequency,
+      annual = 6.25,
+      quarterly = 1600,
+      monthly = 14400
+    )
   }
 
   validate_scalar(lambda, "lambda")
@@ -221,11 +239,15 @@ ik_trend <- function(x,
 
 #' Centred moving average
 #' @noRd
-.trend_ma <- function(x, window) {
+.trend_ma <- function(x, window, frequency) {
   n <- length(x)
 
   if (is.null(window)) {
-    window <- if (n <= 200) 4L else 12L
+    window <- switch(frequency,
+      annual = 3L,
+      quarterly = 4L,
+      monthly = 12L
+    )
   }
 
   validate_positive_integer(window, "window")

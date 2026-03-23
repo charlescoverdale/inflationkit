@@ -39,8 +39,14 @@ test_that("HP filter: lambda defaults for quarterly data", {
 
 test_that("HP filter: lambda defaults for monthly data", {
   x <- rnorm(300)
-  tr <- ik_trend(x, method = "hp")
+  tr <- ik_trend(x, method = "hp", frequency = "monthly")
   expect_equal(tr$lambda, 14400)
+})
+
+test_that("HP filter: lambda defaults for annual data", {
+  x <- rnorm(50)
+  tr <- ik_trend(x, method = "hp", frequency = "annual")
+  expect_equal(tr$lambda, 6.25)
 })
 
 test_that("HP filter: trend has same length as original", {

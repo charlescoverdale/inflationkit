@@ -74,12 +74,26 @@ ik_persistence <- function(x,
       list(value = val, ar_coefficients = ar_coefs)
     },
     half_life = {
-      # Use AR(1) coefficient
-      rho <- if (p >= 1L) ar_coefs[1] else 0
-      if (rho <= 0 || rho >= 1) {
-        val <- if (rho >= 1) Inf else 0
+      if (p == 0L) {
+        val <- 0
+      } else if (p == 1L) {
+        rho <- ar_coefs[1]
+        val <- if (rho <= 0 || rho >= 1) {
+          if (rho >= 1) Inf else 0
+        } else {
+          -log(2) / log(abs(rho))
+        }
       } else {
-        val <- -log(2) / log(abs(rho))
+        # Companion matrix: dominant eigenvalue gives asymptotic decay rate
+        companion <- matrix(0, p, p)
+        companion[1, ] <- ar_coefs
+        companion[cbind(2:p, 1:(p - 1))] <- 1
+        max_eig <- max(Mod(eigen(companion, only.values = TRUE)$values))
+        val <- if (max_eig <= 0 || max_eig >= 1) {
+          if (max_eig >= 1) Inf else 0
+        } else {
+          -log(2) / log(max_eig)
+        }
       }
       list(value = val, ar_coefficients = ar_coefs)
     },

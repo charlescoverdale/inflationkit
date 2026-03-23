@@ -42,6 +42,29 @@ test_that("half_life is computed correctly for AR(1)", {
   expect_equal(p$value, expected_hl, tolerance = 0.5)
 })
 
+test_that("half_life uses companion matrix for AR(2)", {
+  set.seed(123)
+  n <- 500
+  phi1 <- 0.5
+  phi2 <- 0.3
+  x <- numeric(n)
+  x[1:2] <- rnorm(2)
+  for (t in 3:n) x[t] <- phi1 * x[t - 1] + phi2 * x[t - 2] + rnorm(1)
+
+  p <- ik_persistence(x, method = "half_life", ar_order = 2L)
+  expect_length(p$ar_coefficients, 2L)
+
+  # Companion matrix dominant eigenvalue for true coefficients
+  comp <- matrix(c(phi1, phi2, 1, 0), nrow = 2, byrow = TRUE)
+  true_eig <- max(Mod(eigen(comp, only.values = TRUE)$values))
+  true_hl <- -log(2) / log(true_eig)
+
+  # Estimated half-life should be in the right ballpark
+
+  expect_true(p$value > 0)
+  expect_equal(p$value, true_hl, tolerance = 1.0)
+})
+
 test_that("largest_root works", {
   data <- ik_sample_data("headline")
   p <- ik_persistence(data$inflation, method = "largest_root", ar_order = 2L)
