@@ -38,7 +38,7 @@ plot(decomp)
 
 Headline inflation is noisy. Food and energy prices swing month to month, making it hard to tell whether inflation is genuinely rising or just reacting to a temporary shock. Central banks solve this by computing "core" measures (trimmed means, weighted medians, exclusion-based indices) and studying persistence, diffusion, and trend. These are standard tools in every central bank research department, but there is no general-purpose R package for any of them. The only CRAN package with "inflation" in its name (`Inflation`) is Brazil-specific and has not been updated since 2017.
 
-`inflationkit` fills this gap. You bring CPI component data from any country, and the package handles decomposition, core measures, persistence estimation, Phillips curves, trend extraction, and forecast evaluation.
+`inflationkit` fills this gap. You bring CPI component data from any country, and the package handles decomposition, core measures, persistence estimation, Phillips curves, trend extraction, and forecast evaluation. Functions accept any column names, so you can plug in your own dataset without reshaping it first.
 
 
 ## Examples
