@@ -36,11 +36,9 @@ plot(decomp)
 
 ## Why inflationkit?
 
-Inflation is the rate at which prices rise across an economy. Central banks target low, stable inflation (typically around 2% per year) and adjust interest rates to keep it there. But "inflation" is not a single number: it is a weighted average of price changes across hundreds of categories, from food and housing to transport and clothing. Understanding which components are pushing prices up (or down) is essential for diagnosing what is happening in an economy and predicting what comes next.
+Headline inflation is noisy. Food and energy prices swing month to month, making it hard to tell whether inflation is genuinely rising or just reacting to a temporary shock. Central banks solve this by computing "core" measures (trimmed means, weighted medians, exclusion-based indices) and studying persistence, diffusion, and trend. These are standard tools in every central bank research department, but there is no general-purpose R package for any of them. The only CRAN package with "inflation" in its name (`Inflation`) is Brazil-specific and has not been updated since 2017.
 
-The problem is that headline inflation is noisy. Food and energy prices swing wildly from month to month due to weather, supply shocks, and global commodity markets. Central banks need to see through this noise to the underlying trend. This is why they compute "core" inflation measures: the trimmed mean strips out the most extreme price changes, the weighted median takes the middle of the distribution, and exclusion-based core simply drops volatile items like food and energy. Each method makes different assumptions about what counts as noise, and they can give different signals.
-
-Beyond core measures, economists study inflation persistence (how quickly inflation returns to normal after a shock), the Phillips curve (the relationship between inflation and unemployment), diffusion (how broadly prices are rising across categories), and trend extraction (separating the permanent component from transitory shocks). These are standard tools in every central bank research department, yet there is no general-purpose R package for any of them. The only CRAN package with "inflation" in its name (`Inflation`) is Brazil-specific and has not been updated since 2017. `inflationkit` fills this gap. You bring CPI data from any country, and the package handles the analysis.
+`inflationkit` fills this gap. You bring CPI component data from any country, and the package handles decomposition, core measures, persistence estimation, Phillips curves, trend extraction, and forecast evaluation.
 
 
 ## Examples
@@ -175,27 +173,86 @@ dm
 ```
 
 
-## Where do I get CPI data?
+## What data do I need?
 
-`inflationkit` is a pure computation package. It does not download data. You supply data frames with component-level price changes and weights. Common sources:
+Most functions take a data frame with CPI components. Each row is one item in one period:
 
-| Source | Coverage | Free? | How to get into R |
-|--------|----------|-------|-------------------|
-| ONS (UK CPI) | United Kingdom | Yes | [ons](https://cran.r-project.org/package=ons) |
-| BLS (US CPI) | United States | Yes | [fred](https://cran.r-project.org/package=fred) or blscrapeR |
-| ECB (HICP) | Euro area | Yes | [readecb](https://cran.r-project.org/package=readecb) |
-| OECD | 38 countries | Yes | [readoecd](https://cran.r-project.org/package=readoecd) |
-| World Bank | 200+ countries | Yes | WDI package |
-| Statistics offices | Any country | Varies | Download CSV from national statistics website |
+| Column | What it is |
+|--------|-----------|
+| `date` | Date of the observation (e.g. `2024-01-01`) |
+| `item` | Component name (e.g. `"Food"`, `"Housing"`, `"Transport"`) |
+| `weight` | CPI basket weight as a proportion (0.15 = 15%). Should sum to 1 within each date. |
+| `price_change` | Period-on-period price change as a decimal (0.003 = 0.3% monthly inflation) |
 
-Or use the built-in sample data: `ik_sample_data("components")` and `ik_sample_data("headline")`.
+Some functions (`ik_persistence`, `ik_phillips`, `ik_trend`) take a simple numeric vector of headline inflation rates instead.
 
+### Option 1: Use the built-in sample data
 
-## Conventions
+The package includes sample datasets so you can try everything immediately:
 
-- **price_change** values are period-on-period rates (e.g., `0.003` = 0.3% monthly inflation).
-- **weights** should sum to 1 within each period. If they do not, functions normalise them internally.
-- Positive values mean prices are rising.
+```r
+library(inflationkit)
+
+# Component-level data: 10 CPI items, 120 months
+d <- ik_sample_data("components")
+head(d)
+#>         date    item weight price_change
+#> 1 2015-01-01    Food   0.15     0.003218
+#> 2 2015-01-01 Housing   0.25     0.004274
+#> 3 2015-01-01 Transport 0.12    0.001893
+
+# Headline data: monthly inflation + unemployment
+h <- ik_sample_data("headline")
+head(h)
+#>         date inflation unemployment
+#> 1 2015-01-01    0.0025         0.055
+```
+
+### Option 2: Pull UK CPI data from the ONS
+
+```r
+# 1. Install the data package (one time)
+install.packages("ons")
+
+# 2. Download CPI component series
+library(ons)
+cpi <- ons_cpi()   # Returns monthly CPI index by component
+
+# 3. Compute month-on-month price changes and reshape for inflationkit
+library(inflationkit)
+# Your data frame needs: date, item, weight, price_change
+# See ons package documentation for component weights
+```
+
+### Option 3: Pull US CPI data from FRED
+
+```r
+# 1. Install the data package (one time)
+install.packages("fred")
+
+# 2. Get a free API key from https://fred.stlouisfed.org/docs/api/api_key.html
+library(fred)
+fred_set_key("your_api_key_here")
+
+# 3. Download CPI sub-indices
+food    <- fred_series("CPIFABSL")    # Food
+housing <- fred_series("CPIHOSSL")    # Housing
+transport <- fred_series("CPITRNSL")  # Transportation
+
+# 4. Compute month-on-month changes, assign weights, and stack into
+#    a data frame with columns: date, item, weight, price_change
+```
+
+### Where to find CPI data
+
+| Source | Coverage | How to get into R |
+|--------|----------|-------------------|
+| ONS (UK CPI) | United Kingdom | [ons](https://cran.r-project.org/package=ons) |
+| BLS (US CPI) | United States | [fred](https://cran.r-project.org/package=fred) |
+| ECB (HICP) | Euro area | [readecb](https://cran.r-project.org/package=readecb) |
+| OECD | 38 countries | [readoecd](https://cran.r-project.org/package=readoecd) |
+| World Bank | 200+ countries | WDI package |
+| Statistics offices | Any country | Download CSV from national statistics website |
 
 
 ## Functions
