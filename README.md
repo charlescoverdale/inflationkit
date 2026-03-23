@@ -33,7 +33,6 @@ decomp <- ik_decompose(d)
 plot(decomp)
 ```
 
----
 
 ## Why inflationkit?
 
@@ -43,7 +42,6 @@ The problem is that headline inflation is noisy. Food and energy prices swing wi
 
 Beyond core measures, economists study inflation persistence (how quickly inflation returns to normal after a shock), the Phillips curve (the relationship between inflation and unemployment), diffusion (how broadly prices are rising across categories), and trend extraction (separating the permanent component from transitory shocks). These are standard tools in every central bank research department, yet there is no general-purpose R package for any of them. The only CRAN package with "inflation" in its name (`Inflation`) is Brazil-specific and has not been updated since 2017. `inflationkit` fills this gap. You bring CPI data from any country, and the package handles the analysis.
 
----
 
 ## Examples
 
@@ -176,7 +174,6 @@ dm
 #> * No significant difference in predictive accuracy.
 ```
 
----
 
 ## Where do I get CPI data?
 
@@ -193,7 +190,6 @@ dm
 
 Or use the built-in sample data: `ik_sample_data("components")` and `ik_sample_data("headline")`.
 
----
 
 ## Conventions
 
@@ -201,7 +197,6 @@ Or use the built-in sample data: `ik_sample_data("components")` and `ik_sample_d
 - **weights** should sum to 1 within each period. If they do not, functions normalise them internally.
 - Positive values mean prices are rising.
 
----
 
 ## Functions
 
@@ -221,7 +216,6 @@ Or use the built-in sample data: `ik_sample_data("components")` and `ik_sample_d
 
 All functions return S3 objects with `print()` and `plot()` methods.
 
----
 
 ## Academic references
 
@@ -233,7 +227,6 @@ The methods implemented in this package are based on:
 - Beveridge, S. & Nelson, C.R. (1981). "A New Approach to Decomposition of Economic Time Series." *Journal of Monetary Economics*, 7(2), 151-174.
 - Diebold, F.X. & Mariano, R.S. (1995). "Comparing Predictive Accuracy." *Journal of Business & Economic Statistics*, 13(3), 253-263.
 
----
 
 ## Related packages
 
@@ -244,13 +237,11 @@ The methods implemented in this package are based on:
 | [fred](https://github.com/charlescoverdale/fred) | Federal Reserve Economic Data (includes US CPI) |
 | [readecb](https://github.com/charlescoverdale/readecb) | European Central Bank data (includes HICP) |
 
----
 
 ## Issues
 
 Found a bug or have a feature request? Open an issue at <https://github.com/charlescoverdale/inflationkit/issues>.
 
----
 
 ## Keywords
 
