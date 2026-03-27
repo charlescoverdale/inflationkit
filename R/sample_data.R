@@ -31,8 +31,6 @@ ik_sample_data <- function(type = c("components", "headline")) {
 
 #' @noRd
 .sample_components <- function() {
-  old_seed <- .Random.seed
-  on.exit(assign(".Random.seed", old_seed, envir = globalenv()), add = TRUE)
   set.seed(42L)
 
   items <- c(
@@ -79,8 +77,6 @@ ik_sample_data <- function(type = c("components", "headline")) {
 
 #' @noRd
 .sample_headline <- function() {
-  old_seed <- .Random.seed
-  on.exit(assign(".Random.seed", old_seed, envir = globalenv()), add = TRUE)
   set.seed(42L)
 
   n_quarters <- 80L
