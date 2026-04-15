@@ -12,9 +12,10 @@ An R package for inflation analysis. Decompose headline inflation into component
 
 ## Installation
 
-Install from GitHub:
-
 ```r
+install.packages("inflationkit")
+
+# Or install the development version from GitHub
 # install.packages("devtools")
 devtools::install_github("charlescoverdale/inflationkit")
 ```
