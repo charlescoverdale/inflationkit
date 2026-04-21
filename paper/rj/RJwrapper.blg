@@ -1,0 +1,48 @@
+This is BibTeX, Version 0.99d (TeX Live 2024)
+Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
+The top-level auxiliary file: RJwrapper.aux
+The style file: abbrvnat.bst
+Database file #1: RJreferences.bib
+Warning--there's a number but no volume in reis2022burst
+You've used 19 entries,
+            2773 wiz_defined-function locations,
+            742 strings with 8008 characters,
+and the built_in function-call counts, 8749 in all, are:
+= -- 858
+> -- 372
+< -- 22
++ -- 127
+- -- 108
+* -- 691
+:= -- 1334
+add.period$ -- 74
+call.type$ -- 19
+change.case$ -- 92
+chr.to.int$ -- 19
+cite$ -- 39
+duplicate$ -- 404
+empty$ -- 757
+format.name$ -- 149
+if$ -- 1851
+int.to.chr$ -- 1
+int.to.str$ -- 1
+missing$ -- 18
+newline$ -- 118
+num.names$ -- 80
+pop$ -- 147
+preamble$ -- 1
+purify$ -- 73
+quote$ -- 0
+skip$ -- 307
+stack$ -- 0
+substring$ -- 449
+swap$ -- 39
+text.length$ -- 5
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 209
+warning$ -- 1
+while$ -- 96
+width$ -- 0
+write$ -- 288
+(There was 1 warning)

@@ -1,0 +1,118 @@
+\begin{thebibliography}{19}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Beveridge and Nelson(1981)]{beveridge1981new}
+S.~Beveridge and C.~R. Nelson.
+\newblock A new approach to decomposition of economic time series into permanent and transitory components with particular attention to measurement of the `business cycle'.
+\newblock \emph{Journal of Monetary Economics}, 7\penalty0 (2):\penalty0 151--174, 1981.
+\newblock \doi{10.1016/0304-3932(81)90040-4}.
+
+\bibitem[Bils and Klenow(2004)]{bils2004some}
+M.~Bils and P.~J. Klenow.
+\newblock Some evidence on the importance of sticky prices.
+\newblock \emph{Journal of Political Economy}, 112\penalty0 (5):\penalty0 947--985, 2004.
+\newblock \doi{10.1086/422520}.
+
+\bibitem[Bryan and Cecchetti(1994)]{bryan1994measuring}
+M.~F. Bryan and S.~G. Cecchetti.
+\newblock Measuring core inflation.
+\newblock \emph{Monetary Policy}, pages 195--215, 1994.
+\newblock \doi{10.1016/0304-3932(94)90030-2}.
+
+\bibitem[Coibion and Gorodnichenko(2015)]{coibion2015information}
+O.~Coibion and Y.~Gorodnichenko.
+\newblock Information rigidity and the expectations formation process: A simple framework and new facts.
+\newblock \emph{American Economic Review}, 105\penalty0 (8):\penalty0 2644--2678, 2015.
+\newblock \doi{10.1257/aer.20110306}.
+
+\bibitem[Diebold and Mariano(1995)]{diebold1995comparing}
+F.~X. Diebold and R.~S. Mariano.
+\newblock Comparing predictive accuracy.
+\newblock \emph{Journal of Business \& Economic Statistics}, 13\penalty0 (3):\penalty0 253--263, 1995.
+\newblock \doi{10.1080/07350015.1995.10524599}.
+
+\bibitem[Faust and Wright(2013)]{faust2013forecasting}
+J.~Faust and J.~H. Wright.
+\newblock Forecasting inflation.
+\newblock In G.~Elliott and A.~Timmermann, editors, \emph{Handbook of Economic Forecasting}, volume~2A, pages 2--56. Elsevier, 2013.
+\newblock \doi{10.1016/B978-0-444-53683-9.00001-3}.
+
+\bibitem[Friedman(1968)]{friedman1968role}
+M.~Friedman.
+\newblock The role of monetary policy.
+\newblock \emph{American Economic Review}, 58\penalty0 (1):\penalty0 1--17, 1968.
+
+\bibitem[Hazell et~al.(2022)Hazell, Herre\~{n}o, Nakamura, and Steinsson]{hazell2022slope}
+J.~Hazell, J.~Herre\~{n}o, E.~Nakamura, and J.~Steinsson.
+\newblock The slope of the {P}hillips curve: Evidence from {U.S.} states.
+\newblock \emph{Quarterly Journal of Economics}, 137\penalty0 (3):\penalty0 1299--1344, 2022.
+\newblock \doi{10.1093/qje/qjac010}.
+
+\bibitem[Hodrick and Prescott(1997)]{hodrick1997postwar}
+R.~J. Hodrick and E.~C. Prescott.
+\newblock Postwar {U.S.} business cycles: An empirical investigation.
+\newblock \emph{Journal of Money, Credit and Banking}, 29\penalty0 (1):\penalty0 1--16, 1997.
+\newblock \doi{10.2307/2953682}.
+
+\bibitem[Mavroeidis et~al.(2014)Mavroeidis, Plagborg-M{\o}ller, and Stock]{mavroeidis2014empirical}
+S.~Mavroeidis, M.~Plagborg-M{\o}ller, and J.~H. Stock.
+\newblock Empirical evidence on inflation expectations in the {N}ew {K}eynesian {P}hillips curve.
+\newblock \emph{Journal of Economic Literature}, 52\penalty0 (1):\penalty0 124--188, 2014.
+\newblock \doi{10.1257/jel.52.1.124}.
+
+\bibitem[Mincer and Zarnowitz(1969)]{mincer1969evaluation}
+J.~Mincer and V.~Zarnowitz.
+\newblock The evaluation of economic forecasts.
+\newblock In J.~Mincer, editor, \emph{Economic Forecasts and Expectations: Analysis of Forecasting Behavior and Performance}, pages 3--46. National Bureau of Economic Research, New York, 1969.
+
+\bibitem[Nordhaus(1987)]{nordhaus1987forecasting}
+W.~D. Nordhaus.
+\newblock Forecasting efficiency: Concepts and applications.
+\newblock \emph{Review of Economics and Statistics}, 69\penalty0 (4):\penalty0 667--674, 1987.
+\newblock \doi{10.2307/1935962}.
+
+\bibitem[Phelps(1967)]{phelps1967phillips}
+E.~S. Phelps.
+\newblock Phillips curves, expectations of inflation and optimal unemployment over time.
+\newblock \emph{Economica}, 34\penalty0 (135):\penalty0 254--281, 1967.
+\newblock \doi{10.2307/2552025}.
+
+\bibitem[Phillips(1958)]{phillips1958relation}
+A.~W. Phillips.
+\newblock The relation between unemployment and the rate of change of money wage rates in the {U}nited {K}ingdom, 1861-1957.
+\newblock \emph{Economica}, 25\penalty0 (100):\penalty0 283--299, 1958.
+\newblock \doi{10.1111/j.1468-0335.1958.tb00003.x}.
+
+\bibitem[Pivetta and Reis(2007)]{pivetta2007persistence}
+F.~Pivetta and R.~Reis.
+\newblock The persistence of inflation in the {U}nited {S}tates.
+\newblock \emph{Journal of Economic Dynamics and Control}, 31\penalty0 (4):\penalty0 1326--1358, 2007.
+\newblock \doi{10.1016/j.jedc.2006.05.001}.
+
+\bibitem[Ravn and Uhlig(2002)]{ravn2002adjusting}
+M.~O. Ravn and H.~Uhlig.
+\newblock On adjusting the {H}odrick-{P}rescott filter for the frequency of observations.
+\newblock \emph{Review of Economics and Statistics}, 84\penalty0 (2):\penalty0 371--376, 2002.
+\newblock \doi{10.1162/003465302317411604}.
+
+\bibitem[Reis(2022)]{reis2022burst}
+R.~Reis.
+\newblock The burst of high inflation in 2021-22: How and why did we get here?
+\newblock \emph{CEPR Discussion Paper}, \penalty0 (DP17514), 2022.
+
+\bibitem[Shapiro(2022)]{shapiro2022supply}
+A.~H. Shapiro.
+\newblock How much do supply and demand drive inflation?
+\newblock FRBSF Economic Letter 2022-15, Federal Reserve Bank of San Francisco, 2022.
+
+\bibitem[Stock and Watson(2007)]{stock2007why}
+J.~H. Stock and M.~W. Watson.
+\newblock Why has {U.S.} inflation become harder to forecast?
+\newblock \emph{Journal of Money, Credit and Banking}, 39\penalty0 (s1):\penalty0 3--33, 2007.
+\newblock \doi{10.1111/j.1538-4616.2007.00014.x}.
+
+\end{thebibliography}

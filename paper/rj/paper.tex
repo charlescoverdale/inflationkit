@@ -1,0 +1,504 @@
+% !TeX root = RJwrapper.tex
+\title{Inflation Decomposition, Persistence, and Phillips Curves in R}
+\author{by Charles Coverdale}
+
+\maketitle
+
+\abstract{%
+The \CRANpkg{inflationkit} package provides a general-purpose toolkit
+for analysing inflation dynamics in R. It decomposes headline price
+indices into weighted component contributions, computes core inflation
+measures (trimmed mean, weighted median, exclusion-based, asymmetric
+trim) following Bryan and Cecchetti (1994), measures inflation
+persistence via the sum of autoregressive coefficients with
+companion-matrix half-life, fits traditional, expectations-augmented,
+and hybrid Phillips curves with heteroscedasticity-and-autocorrelation
+consistent standard errors, extracts trend inflation via
+Beveridge-Nelson and Hodrick-Prescott filters, computes breakeven
+inflation from nominal and real yields, and evaluates inflation
+forecasts via Mincer-Zarnowitz bias regressions, Nordhaus efficiency,
+and Diebold-Mariano comparative-accuracy tests. Every function accepts
+arbitrary column names and works with price data from any country or
+source. The package is available on CRAN; source is at
+\url{https://github.com/charlescoverdale/inflationkit}.
+}
+
+\subsection{Introduction}\label{introduction}
+
+The \CRANpkg{inflationkit} package implements the standard toolkit of
+inflation analysis: decomposition of headline price indices into
+component contributions, core inflation measures, persistence and
+diffusion diagnostics, Phillips curves, trend extraction, breakeven
+computation, and forecast evaluation. Eleven exported functions share a
+uniform \code{ik\_} prefix and a data-frame-in, data-frame-out
+interface, so a user who knows \code{ik\_decompose()} can reach for
+\code{ik\_core()}, \code{ik\_persistence()}, or \code{ik\_phillips()}
+without re-reading documentation.
+
+The state of R infrastructure for inflation analysis has been poor. The
+only CRAN package whose name suggests the topic, \pkg{Inflation}, is
+narrow in scope (four core-inflation methods only, no decomposition,
+persistence, Phillips curves, or forecast evaluation) and has not been
+updated since 2017. Applied work on inflation in central banks,
+sovereign treasuries, and private-sector research departments routinely
+requires all of these diagnostics. These have been available as bespoke
+scripts, spreadsheet workbooks, or proprietary software rather than as a
+single cited, tested R package. \CRANpkg{inflationkit} consolidates the
+operations applied economists actually need behind a single consistent
+interface.
+
+The package is pure computation. Runtime imports are \CRANpkg{cli},
+\code{grDevices}, \code{graphics}, and \code{stats}; three of the four
+ship with base R. There are no API calls, no network access, and no
+bundled upstream price data. Every function accepts arbitrary column
+names, which lets users pass data directly from ONS, Eurostat, the US
+BLS, the ABS, or any other statistical agency without reshaping it into
+a package-specific schema first.
+
+\subsection{Background}\label{background}
+
+Modern inflation analysis rests on four empirical regularities that the
+package is organised around.
+
+\textbf{Headline inflation is noisy.} Food and energy prices swing month
+to month for supply-side reasons (weather, OPEC decisions, harvest
+failures) that carry little information about the underlying inflation
+trend. \citet{bryan1994measuring} introduced the programme of ``core''
+measures that discard tail observations or downweight high-variance
+components. They showed that a trimmed-mean CPI produces a measure more
+closely correlated with future inflation than either headline or the
+conventional ex-food-and-energy exclusion index. The Federal Reserve
+Bank of Cleveland has published a trimmed-mean CPI on exactly this basis
+for three decades.
+
+\textbf{Component contributions are structurally informative.}
+Decomposing headline inflation into the weighted price change of each
+component (food, housing, transport, energy, and so on) is the first
+step in any inflation briefing, because the headline number aggregates
+causes that have entirely different policy implications. A headline
+spike driven by energy is a relative-price shock; one driven by services
+and housing is evidence of excess demand.
+
+\textbf{Prices differ in how often they are adjusted.}
+\citet{bils2004some} classified US CPI components by the median
+frequency of price change, and showed that a distinction between
+``sticky'' and ``flexible'' prices yields a cleaner read of
+monetary-policy transmission than core inflation does. Prices that
+change seldom have, by definition, a longer horizon for incorporating
+information; their inflation rate tracks expectations.
+
+\textbf{Inflation has its own dynamics.} The sum of autoregressive
+coefficients estimated on the inflation series, popularised as a
+persistence statistic in the monetary economics literature by
+\citet{pivetta2007persistence}, measures how quickly inflation reverts
+to its mean. A sum near one implies near-permanent deviations: a 1 per
+cent shock today is mostly still there in twenty-four months. A sum of
+0.5 implies a half-life of roughly ten months. This single statistic
+captures a critical part of the policy problem.
+
+\textbf{Persistence is partly an artefact of a drifting trend.}
+\citet{stock2007why} show that US inflation persistence, measured by the
+first-order autocorrelation of the series, is high in part because the
+local mean has drifted over time: once inflation is decomposed into a
+stochastic-volatility trend and a stationary gap, the gap is close to
+white noise. The implication is that a persistence statistic estimated
+on unfiltered headline inflation overstates the propagation of
+idiosyncratic shocks. A user of the package should pair
+\code{ik\_persistence()} with \code{ik\_trend()}, running the former on
+the gap rather than the level, when the local mean is visibly
+non-stationary.
+
+\textbf{Inflation responds to slack and to expectations.} The
+traditional Phillips curve \citep{phillips1958relation} posits a
+trade-off between inflation and unemployment; \citet{phelps1967phillips}
+and \citet{friedman1968role} showed that in the long run only unexpected
+inflation affects activity, so the relevant specification is a New
+Keynesian hybrid Phillips curve with a lagged inflation term and a
+forward-looking expectations term.
+
+\textbf{The Phillips curve slope is weakly identified in aggregate US
+data.} \citet{mavroeidis2014empirical} survey the empirical literature
+and document that estimates of the slope range from near zero to
+substantial depending on the instrument set, the sample, and the
+specification. Recent revival of Phillips curve estimation, notably
+\citet{hazell2022slope}, uses cross-sectional variation across US states
+to bypass the aggregate identification problem and recover a slope
+robust to supply shocks and expectations endogeneity. A single-equation
+OLS fit, as offered by \code{ik\_phillips()} with the traditional or
+expectations-augmented specification, is therefore a starting point
+rather than a final answer; users interested in structural inference
+should treat the output as a diagnostic and follow up with regional or
+instrumental-variable designs.
+
+\textbf{Forecasts should be evaluated.} \citet{mincer1969evaluation}
+proposed regressing realised values on forecasts to test the joint null
+of zero bias and unit slope. \citet{nordhaus1987forecasting} identified
+forecast-revision predictability as a violation of weak efficiency.
+\citet{diebold1995comparing} derived a test for equal predictive
+accuracy between two competing forecasts. These three diagnostics
+together are the usual pre-commitment for any published inflation
+forecast, and \citet{faust2013forecasting} review their application in
+the inflation context. Nordhaus-style efficiency tests have received
+renewed attention following \citet{coibion2015information}, who
+interpret predictable forecast revisions as evidence of information
+rigidities in expectation formation.
+
+\textbf{Trend inflation is unobserved.} Central banks target core or
+trend inflation, not headline, but ``trend'' is a latent state. The
+Hodrick-Prescott filter \citep{hodrick1997postwar} with a
+frequency-based smoothing parameter extracts a slow-moving trend; the
+Beveridge-Nelson decomposition \citep{beveridge1981new} derives one
+analytically from a fitted ARMA model. Both are in common use, and
+\CRANpkg{inflationkit} implements both plus exponential smoothing and
+moving averages for users who want simple, transparent baselines.
+
+\subsection{Package design}\label{package-design}
+
+\subsubsection{Architecture}\label{architecture}
+
+\CRANpkg{inflationkit} is pure R with no compiled code. Runtime imports
+are \CRANpkg{cli} (error messages), \code{grDevices}, \code{graphics},
+and \code{stats}. R 4.1.0 or later is required. The only suggested
+package is \CRANpkg{testthat} for the test suite, which contains over
+two hundred tests across every exported function.
+
+\subsubsection{Uniform function
+interface}\label{uniform-function-interface}
+
+Every exported function is prefixed \code{ik\_}. Data functions
+(\code{ik\_decompose}, \code{ik\_core}, \code{ik\_sticky\_flexible},
+\code{ik\_compare}) accept a component-level data frame; analytical
+functions (\code{ik\_persistence}, \code{ik\_phillips},
+\code{ik\_trend}, \code{ik\_breakeven}, \code{ik\_forecast\_eval})
+accept one or two numeric vectors. All functions expose optional
+arguments for flexible column naming via the \code{date\_col},
+\code{item\_col}, \code{weight\_col}, and \code{price\_col} arguments,
+so data from any statistical agency works without reshaping.
+
+\subsubsection{S3 classes and methods}\label{s3-classes-and-methods}
+
+Each function returns an S3 object with a \code{print()} method:
+\code{ik\_decomposition}, \code{ik\_core}, \code{ik\_persistence},
+\code{ik\_phillips}, \code{ik\_trend}, \code{ik\_breakeven},
+\code{ik\_forecast\_eval}, \code{ik\_comparison}, and
+\code{ik\_sticky\_flexible}. Where a geometric view is informative, a
+\code{plot()} method exists (\code{ik\_decomposition} renders as a
+stacked contribution chart; \code{ik\_trend} as a trend-and-cycle
+panel).
+
+\subsubsection{Reproducibility and sample
+data}\label{reproducibility-and-sample-data}
+
+Every numerical result is deterministic given the input.
+\code{ik\_sample\_data()} provides three synthetic datasets (components,
+headline, panel) with a fixed seed, used in examples and in the
+canonical replication below.
+
+\subsection{Decomposition and core
+inflation}\label{decomposition-and-core-inflation}
+
+\code{ik\_decompose(data, date\_col, item\_col, weight\_col, price\_col)}
+
+returns the weighted contribution of each component to headline
+inflation, plus the headline series itself. Figure \ref{fig:headline}
+shows the output on a synthetic ten-year, ten-component panel with a
+pandemic-era mean shift built in. The headline line tracks around the 2
+per cent target in the pre-pandemic window, climbs to a peak above 12
+per cent during the 2021 to 2022 shock, and fades back through 2024. The
+trimmed-mean core and the Hodrick-Prescott trend both attenuate the peak
+and settle near 3 per cent in the tail, providing a cleaner read of the
+underlying signal.
+
+\begin{figure}[tbp]
+\centering
+\includegraphics[width=\linewidth]{figures/fig1_headline_core_trend.pdf}
+\caption{\textbf{Headline, trimmed-mean core, and Hodrick-Prescott trend inflation on a ten-year synthetic panel, 2015 to 2024.} Synthetic ten-component CPI panel with a pandemic-era mean shift from April 2021 to December 2023 (shaded window). Grey line: headline, 12-month annualised. Blue line: trimmed-mean core (8 per cent symmetric trim). Red line: Hodrick-Prescott trend ($\lambda = 14400$). Dashed line at 2 per cent is the implied inflation target.}
+\label{fig:headline}
+\end{figure}
+
+Figure \ref{fig:decompose} shows the component contribution stack for
+the same panel. Energy and transport dominate the peak, consistent with
+the commodity-price transmission channel that the pandemic literature
+has documented. Housing is a slower-moving contributor throughout.
+
+\begin{figure}[tbp]
+\centering
+\includegraphics[width=\linewidth]{figures/fig2_decompose.pdf}
+\caption{\textbf{Weighted component contributions to annualised headline inflation, ten-component synthetic panel, 2015 to 2024.} Stacked area of \code{ik\_decompose()} output. Component heights sum to the headline inflation rate (black overlay). Pandemic-era peak is dominated by energy and transport contributions; housing contributes slowly throughout.}
+\label{fig:decompose}
+\end{figure}
+
+\code{ik\_core(data, method, trim, exclude, trim\_lower, trim\_upper)}
+
+returns the chosen core measure. Four methods are available. Trimmed
+mean drops symmetric tails of the cross-sectional distribution of price
+changes each period, then weights the remaining components by their CPI
+weights. Weighted median takes the 50th percentile of the weighted
+distribution each period. Exclusion fixes a set of components to be
+dropped in all periods. Asymmetric trim allows different trim fractions
+at the lower and upper tails, which is the Federal Reserve Bank of
+Cleveland's approach to persistent positive skew in the cross-section of
+monthly price changes. Figure \ref{fig:core} compares all four on a
+common series.
+
+\begin{figure}[tbp]
+\centering
+\includegraphics[width=\linewidth]{figures/fig3_core_comparison.pdf}
+\caption{\textbf{Four core inflation measures compared against headline on the same synthetic panel.} All four measures agree in the stationary pre-shock regime and in the post-shock tail. They diverge sharply during the spike: exclusion (dropping food and energy by rule) under-attenuates the shock relative to the distribution-based measures (trimmed mean, weighted median), which drop whichever components happen to be at the tails in each month.}
+\label{fig:core}
+\end{figure}
+
+\code{ik\_sticky\_flexible(data, sticky\_items)} partitions the
+component set into sticky and flexible groups, following
+\citet{bils2004some}, and returns the sticky-component and
+flexible-component inflation series separately. The argument
+\code{sticky\_items} accepts either a user-supplied vector or defaults
+based on the Atlanta Fed's published sticky-price index composition.
+
+\subsection{Persistence, diffusion, and Phillips
+curves}\label{persistence-diffusion-and-phillips-curves}
+
+\code{ik\_persistence(x, method, ar\_order, max\_order, ic)} fits an
+autoregressive model to the inflation series and returns the sum of
+autoregressive coefficients, the half-life (the period at which a unit
+shock has decayed to one half, computed from the companion matrix), or
+the largest eigenvalue of the companion matrix, depending on the
+\code{method} argument. If \code{ar\_order} is \code{NULL}, the order is
+selected by information criterion (BIC or AIC) over lag lengths one to
+\code{max\_order}.
+
+\code{ik\_diffusion(data)} returns the diffusion index, which is the
+share of components with positive price changes in each period, minus
+the share with negative changes. Values near one indicate broad-based
+inflation; values near zero indicate that a small number of components
+are driving the aggregate.
+
+\code{ik\_phillips(inflation, slack, type, lags, robust\_se)} fits a
+Phillips curve of one of three types. The traditional specification
+regresses inflation on slack (the output gap or unemployment gap). The
+expectations-augmented specification adds lagged inflation as a proxy
+for adaptive expectations. The hybrid New Keynesian form adds both a
+lead and a lag. Standard errors can be ordinary or
+heteroscedasticity-and-autocorrelation consistent via the Newey-West
+estimator, selected with \code{robust\_se = "HAC"}. Figure
+\ref{fig:phillips} shows a fitted traditional Phillips curve on
+quarterly synthetic data.
+
+\begin{figure}[tbp]
+\centering
+\includegraphics[width=\linewidth]{figures/fig4_phillips.pdf}
+\caption{\textbf{Phillips curve scatter and ordinary-least-squares fit on 40 quarters of synthetic data, 2015 Q1 to 2024 Q4.} Quarterly inflation on the vertical axis, output gap on the horizontal. Points coloured from sky blue (earliest) to deep red (latest). Dashed lines mark zero output gap and the 2 per cent inflation target. Slope estimate 0.58, $R^2 = 0.52$. The pandemic-era cluster in the top-right traces a steeper short-run Phillips relationship.}
+\label{fig:phillips}
+\end{figure}
+
+\code{ik\_breakeven(nominal\_yield, real\_yield)} returns the breakeven
+inflation rate as the spread between nominal and real bond yields of
+matched maturity. This is a market-implied measure of expected inflation
+and is central to the modern inflation-targeting literature.
+
+\subsection{Trend extraction}\label{trend-extraction}
+
+\code{ik\_trend(x, method, lambda, window, alpha)} extracts a trend from
+a noisy inflation series. Four methods are available. Hodrick-Prescott
+is the default; the smoothing parameter \(\lambda\) can be specified
+explicitly or left to a frequency-based default: 6.25 for annual, 1600
+for quarterly following \citet{hodrick1997postwar}, or 14400 for monthly
+following common practice at central-bank research departments. Users
+who prefer the \citet{ravn2002adjusting} cross-frequency adjustment
+formula (\(\lambda\) quadrupling with the power of four in observation
+frequency) can pass \(\lambda = 129600\) directly. Beveridge-Nelson
+derives the trend analytically from a fitted ARIMA model, so the
+decomposition is grounded in the estimated time-series structure rather
+than a tuning parameter. Exponential smoothing and moving average are
+exposed for users who want simple, transparent baselines rather than a
+model-implied extraction.
+
+The choice matters. HP is robust to the model but requires a choice of
+\(\lambda\); reviewers have criticised its end-point bias and the
+sensitivity of the extracted trend to the sample window. Beveridge-
+Nelson avoids both criticisms but depends on the chosen ARIMA
+specification. Applied work often reports both.
+
+\subsection{Forecast evaluation}\label{forecast-evaluation}
+
+\code{ik\_forecast\_eval(actual, forecast, test, forecast2, horizon)}
+
+provides three tests, selected via the \code{test} argument:
+\code{"bias"} for the Mincer-Zarnowitz regression, \code{"efficiency"}
+for the Nordhaus test, and \code{"dm"} for the Diebold-Mariano
+comparative-accuracy test (which requires \code{forecast2}). The
+Mincer-Zarnowitz regression fits \(y_t = \alpha +
+\beta \hat y_t + \varepsilon_t\) and tests the joint null
+\((\alpha, \beta) = (0, 1)\); a rejection indicates forecast bias or
+systematic under- or over-reaction. The Nordhaus test regresses the
+forecast revision on prior revisions and tests the null of zero slope; a
+rejection indicates predictable revision and thus a violation of weak
+efficiency. The Diebold-Mariano test compares two forecast series on the
+same target and returns the test statistic and \(p\)-value for equal
+predictive accuracy.
+
+Figure \ref{fig:mz} shows a Mincer-Zarnowitz scatter for a naive
+AR(1)-with-drift forecast against realised headline inflation. The
+estimated slope is well below one and the test rejects the joint null at
+any conventional level: the forecast is biased, under- reacting to the
+pandemic spike as it occurred.
+
+\begin{figure}[tbp]
+\centering
+\includegraphics[width=\linewidth]{figures/fig5_mz.pdf}
+\caption{\textbf{Mincer-Zarnowitz scatter of realised inflation against a naive forecast on 120 months of synthetic data.} Dashed line is the 45 degree line of perfect forecasting. Red line is the fitted Mincer-Zarnowitz regression with 95 per cent pointwise band. The slope estimate falls well short of unity and the intercept deviates from zero, indicating both bias (intercept) and under-reaction (slope).}
+\label{fig:mz}
+\end{figure}
+
+\subsection{Replication}\label{replication}
+
+Table \ref{tab:compare} reports summary statistics for four core
+measures on the synthetic panel used throughout this paper, with the
+headline series shown for reference. All four core measures have lower
+standard deviations than headline (by construction) and lower pandemic
+peaks; the distribution-based measures (trimmed mean and weighted
+median) attenuate the peak more than the fixed-exclusion rule does,
+consistent with the findings of \citet{bryan1994measuring}.
+
+\begin{table}[tbp]
+\centering
+\caption{\textbf{Summary statistics of four core inflation measures and headline on the ten-year synthetic panel.} Values are annualised per cent. Correlation is the Pearson correlation of the core series with headline over the full 120-month panel. All four cores attenuate the pandemic peak relative to headline, with the weighted median attenuating most and the fixed exclusion rule least.}
+\label{tab:compare}
+\input{tables/compare.tex}
+\end{table}
+
+The canonical workflow is five lines:
+
+\begin{verbatim}
+library(inflationkit)
+d <- ik_sample_data("components")
+ik_decompose(d)
+ik_core(d, method = "trimmed_mean", trim = 0.08)
+ik_persistence(ik_decompose(d)$headline$headline_inflation)
+ik_phillips(inflation = infl, slack = output_gap, type = "traditional")
+\end{verbatim}
+
+Each call returns an S3 object with a \code{print()} method.
+
+\subsection{Case study: the pandemic-era diagnostic
+playbook}\label{case-study-the-pandemic-era-diagnostic-playbook}
+
+The 2021 to 2023 inflation episode was the largest test of
+inflation-targeting regimes in three decades, studied in detail by
+\citet{reis2022burst}, \citet{shapiro2022supply}, and others.
+\CRANpkg{inflationkit} supports each diagnostic step central banks ran
+through during that period.
+
+Figure \ref{fig:fred} applies the package to real US CPI data from the
+Federal Reserve Bank of St.~Louis Economic Data (FRED) service: the
+headline consumer price index (series \code{CPIAUCSL}) and the
+less-food-and-energy core (\code{CPILFESL}), monthly, from 2015 through
+2026, expressed as year-over-year growth. The pandemic-era spike peaks
+above 9 per cent in June 2022, attenuated to 6.7 per cent in core, and
+the Hodrick-Prescott trend extracted by \code{ik\_trend()} captures the
+regime shift. Running \code{ik\_persistence()} on the year-over-year
+series with BIC-selected lag length returns a sum-of-AR statistic close
+to 0.97, consistent with the high-persistence reading
+\citet{stock2007why} flag when inflation is not first decomposed into a
+trend-plus-gap model.
+
+\begin{figure}[tbp]
+\centering
+\includegraphics[width=\linewidth]{figures/fig6_fred.pdf}
+\caption{\textbf{US CPI inflation applied through \CRANpkg{inflationkit}, 2015 to 2026.} Monthly year-over-year growth of the headline CPI (\code{CPIAUCSL}, grey) and less-food-and-energy core (\code{CPILFESL}, blue), sourced from FRED. HP trend (red dashed) extracted via \code{ik\_trend(method = "hp", lambda = 14400)}. Shaded window marks April 2021 to December 2023. Dashed horizontal line at 2 per cent is the Federal Reserve's long-run target. Sum-of-autoregressive-coefficients persistence on headline, estimated by \code{ik\_persistence()} with BIC-selected lag length, is 0.97.}
+\label{fig:fred}
+\end{figure}
+
+First, \code{ik\_decompose()} answers whether the spike is broad-based
+or concentrated. Figure \ref{fig:decompose} shows that in the synthetic
+panel it is concentrated in energy and transport, with housing and
+services contributing steadily but not surging. Second,
+\code{ik\_core()} estimates what fraction of the spike is plausibly
+transitory. Trimmed mean removes the highest-frequency outliers each
+month and, on the synthetic panel, halves the peak from 12 to 6 per
+cent. Third, \code{ik\_persistence()} estimates how long the peak will
+stick: the sum-of-AR-coefficients statistic on monthly headline gives a
+half-life in the region of a year on the synthetic data, consistent with
+the post-pandemic monthly CPI of actual economies. Fourth,
+\code{ik\_phillips()} checks whether the inflation path is consistent
+with a standard slack relationship. Figure \ref{fig:phillips} shows the
+fit: the pandemic-era cluster sits above the main cloud, suggesting
+supply-side factors beyond slack that were not captured in the
+traditional specification. Fifth, \code{ik\_forecast\_eval()} diagnoses
+the large forecast errors that arose during the period. Figure
+\ref{fig:mz} shows a naive AR(1)-with-drift forecast failing the
+Mincer-Zarnowitz test by a wide margin.
+
+Each step is one function call. The package produces the diagnostic
+table that a central-bank staff note contains as a matter of course,
+without requiring any bespoke modelling code. A modern extension of the
+same playbook, following \citet{shapiro2022supply}, would decompose the
+spike into supply-driven and demand-driven components by sign
+restrictions on the co-movement of price and quantity across categories.
+That decomposition is not currently exposed in the package and is
+flagged for a future release.
+
+\subsection{Limitations}\label{limitations}
+
+Five limitations apply.
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \CRANpkg{inflationkit} does not implement seasonal adjustment. Users
+  should apply X-13ARIMA-SEATS (via \CRANpkg{seasonal}) before passing
+  raw not-seasonally-adjusted series to any of the package's dynamics
+  functions.
+\item
+  The package fits single-equation Phillips curves. Multivariate
+  specifications, including VARs and New Keynesian DSGEs with
+  price-setting blocks, are out of scope; for those, use \CRANpkg{vars},
+  \CRANpkg{BVAR}, or a general-purpose estimation framework.
+\item
+  Trend inflation is estimated by HP, Beveridge-Nelson, exponential
+  smoothing, and moving average. Bayesian trend estimation with
+  time-varying volatility (Stock and Watson's unobserved-components
+  stochastic-volatility model) is not implemented.
+\item
+  Forecast evaluation covers bias, efficiency, and comparative accuracy
+  tests. Density-forecast evaluation (continuous ranked probability
+  score, probability integral transforms) is not implemented.
+\item
+  The package operates on final-vintage data and does not account for
+  real-time data revisions. Analyses of forecast performance in real
+  time should construct vintage data frames separately.
+\end{enumerate}
+
+\FloatBarrier
+
+\subsection{Conclusion}\label{conclusion}
+
+Inflation analysis is central to applied macroeconomics yet had been
+underserved on CRAN, with private spreadsheets and bespoke scripts doing
+the work that a tested, cited package ought to do.
+\CRANpkg{inflationkit} fills that gap with eleven functions covering
+decomposition, core measures, persistence, Phillips curves, trend
+extraction, breakeven calculation, and forecast evaluation, all behind a
+uniform interface that accepts any reasonable column layout. The package
+is pure R, has four runtime imports, and works with data from any
+central bank or statistical agency. Planned additions include a
+Shapiro-style supply-demand decomposition of category-level inflation
+via \code{ik\_supply\_demand()}, Bayesian trend estimation with
+stochastic volatility following \citet{stock2007why}, density-forecast
+evaluation, real-time vintage support, and a regional-variation Phillips
+curve interface inspired by \citet{hazell2022slope}. Contributions and
+bug reports are welcome at
+\url{https://github.com/charlescoverdale/inflationkit}.
+
+\bibliography{RJreferences.bib}
+
+\address{%
+Charles Coverdale\\
+London, United Kingdom\\%
+United Kingdom\\
+%
+\url{https://github.com/charlescoverdale/inflationkit}\\%
+%
+\href{mailto:charles.f.coverdale@gmail.com}{\nolinkurl{charles.f.coverdale@gmail.com}}%
+}
