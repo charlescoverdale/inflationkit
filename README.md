@@ -291,8 +291,8 @@ All functions return S3 objects with `print()` and `plot()` methods.
 
 The methods implemented in this package are based on:
 
-- Bryan, M.F. & Cecchetti, S.G. (1994). "Measuring Core Inflation." In *Monetary Policy*, ed. N.G. Mankiw, University of Chicago Press, 195-215. [doi:10.1016/0304-3932(94)90030-2](https://doi.org/10.1016/0304-3932(94)90030-2)
-- Bils, M. & Klenow, P.J. (2004). "Some Evidence on the Importance of Sticky Prices." *Journal of Political Economy*, 112(5), 947-985.
+- Bryan, M.F. & Cecchetti, S.G. (1994). "Measuring Core Inflation." In *Monetary Policy*, ed. N.G. Mankiw, University of Chicago Press, 195-219. (NBER Working Paper [w4303](https://www.nber.org/papers/w4303))
+- Bils, M. & Klenow, P.J. (2004). "Some Evidence on the Importance of Sticky Prices." *Journal of Political Economy*, 112(5), 947-985. [doi:10.1086/422559](https://doi.org/10.1086/422559)
 - Marques, C.R. (2004). "Inflation Persistence: Facts or Artefacts?" ECB Working Paper No. 371.
 - Beveridge, S. & Nelson, C.R. (1981). "A New Approach to Decomposition of Economic Time Series." *Journal of Monetary Economics*, 7(2), 151-174.
 - Diebold, F.X. & Mariano, R.S. (1995). "Comparing Predictive Accuracy." *Journal of Business & Economic Statistics*, 13(3), 253-263.
