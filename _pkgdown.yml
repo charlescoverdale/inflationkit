@@ -1,0 +1,38 @@
+url: https://charlescoverdale.github.io/inflationkit/
+
+template:
+  bootstrap: 5
+
+navbar:
+  structure:
+    left:  [intro, reference, articles, news]
+    right: [search, github]
+
+reference:
+  - title: "Core Measures"
+    desc: "Core, sticky-flexible, and trend inflation"
+    contents:
+      - ik_core
+      - ik_sticky_flexible
+      - ik_trend
+
+  - title: "Decomposition and Dynamics"
+    desc: "Component breakdown, persistence, and Phillips curve"
+    contents:
+      - ik_decompose
+      - ik_persistence
+      - ik_phillips
+      - ik_diffusion
+      - ik_breakeven
+
+  - title: "Evaluation"
+    desc: "Forecast accuracy and cross-country comparison"
+    contents:
+      - ik_forecast_eval
+      - ik_compare
+
+  - title: "Data"
+    desc: "Sample data"
+    contents:
+      - ik_sample_data
+

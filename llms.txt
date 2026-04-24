@@ -1,0 +1,26 @@
+# inflationkit
+
+> Tools for analysing inflation dynamics. Install with `install.packages("inflationkit")`.
+
+Version: 0.1.0. License: MIT.
+
+## Functions
+
+- [`ik_breakeven()`](https://charlescoverdale.github.io/inflationkit/reference/ik_breakeven.html): Compute breakeven inflation rates
+- [`ik_compare()`](https://charlescoverdale.github.io/inflationkit/reference/ik_compare.html): Compare multiple core inflation measures
+- [`ik_core()`](https://charlescoverdale.github.io/inflationkit/reference/ik_core.html): Compute core inflation measures
+- [`ik_decompose()`](https://charlescoverdale.github.io/inflationkit/reference/ik_decompose.html): Decompose inflation into weighted component contributions
+- [`ik_diffusion()`](https://charlescoverdale.github.io/inflationkit/reference/ik_diffusion.html): Compute an inflation diffusion index
+- [`ik_forecast_eval()`](https://charlescoverdale.github.io/inflationkit/reference/ik_forecast_eval.html): Evaluate inflation forecasts
+- [`ik_persistence()`](https://charlescoverdale.github.io/inflationkit/reference/ik_persistence.html): Measure inflation persistence
+- [`ik_phillips()`](https://charlescoverdale.github.io/inflationkit/reference/ik_phillips.html): Estimate a Phillips curve
+- [`ik_sample_data()`](https://charlescoverdale.github.io/inflationkit/reference/ik_sample_data.html): Generate sample inflation data
+- [`ik_sticky_flexible()`](https://charlescoverdale.github.io/inflationkit/reference/ik_sticky_flexible.html): Decompose inflation into sticky and flexible components
+- [`ik_trend()`](https://charlescoverdale.github.io/inflationkit/reference/ik_trend.html): Estimate trend inflation
+
+## Documentation
+
+- [Full reference](https://charlescoverdale.github.io/inflationkit/reference/)
+- [GitHub](https://github.com/charlescoverdale/inflationkit)
+- [CRAN](https://CRAN.R-project.org/package=inflationkit)
+
