@@ -36,3 +36,7 @@ reference:
     contents:
       - ik_sample_data
 
+
+  - title: "Package"
+    contents:
+      - inflationkit-package
