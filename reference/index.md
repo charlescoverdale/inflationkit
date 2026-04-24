@@ -41,3 +41,10 @@ Sample data
 
 - [`ik_sample_data()`](https://charlescoverdale.github.io/inflationkit/reference/ik_sample_data.md)
   : Generate sample inflation data
+
+## Package
+
+- [`inflationkit`](https://charlescoverdale.github.io/inflationkit/reference/inflationkit-package.md)
+  [`inflationkit-package`](https://charlescoverdale.github.io/inflationkit/reference/inflationkit-package.md)
+  : inflationkit: Inflation Decomposition, Core Measures, and Trend
+  Estimation
