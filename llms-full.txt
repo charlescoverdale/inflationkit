@@ -1,0 +1,506 @@
+# inflationkit — full API reference
+
+> Tools for analysing inflation dynamics.
+
+- Version: 0.1.0
+- Install: `install.packages("inflationkit")`
+- CRAN: https://CRAN.R-project.org/package=inflationkit
+- GitHub: https://github.com/charlescoverdale/inflationkit
+- Reference site: https://charlescoverdale.github.io/inflationkit/
+
+This file is a self-contained reference for LLM agents: every exported
+function with its signature, arguments, return value, and example.
+
+---
+
+## `ik_breakeven()`
+
+**Compute breakeven inflation rates**
+
+Calculates breakeven inflation as the spread between nominal and real (inflation-linked) bond yields. This provides a market-based measure of inflation expectations.
+
+**Usage**
+
+```r
+ik_breakeven(nominal_yield, real_yield, maturity = NULL)
+```
+
+**Arguments**
+
+- `nominal_yield` — Numeric vector. Nominal bond yields.
+- `real_yield` — Numeric vector. Real (inflation-linked) bond yields, same length as `nominal_yield`.
+- `maturity` — Numeric vector or `NULL`. Bond maturities in years. If provided, must be the same length as `nominal_yield`.
+
+**Returns**
+
+An S3 object of class `"ik_breakeven"` with elements: breakevenIf `maturity` is provided, a data.frame with columns: maturity, nominal, real, breakeven. Otherwise, a numeric vector of breakeven rates. maturityThe maturity vector (or `NULL`).
+
+**Example**
+
+```r
+# Breakeven term structure
+be <- ik_breakeven(
+  nominal_yield = c(4.2, 4.5, 4.8, 5.0),
+  real_yield = c(1.8, 2.0, 2.3, 2.5),
+  maturity = c(2, 5, 10, 30)
+)
+print(be)
+plot(be)
+
+# Simple breakeven (no maturity)
+be2 <- ik_breakeven(nominal_yield = 4.5, real_yield = 2.0)
+print(be2)
+```
+
+---
+
+## `ik_compare()`
+
+**Compare multiple core inflation measures**
+
+Takes multiple `ik_core` objects and facilitates side-by-side comparison. Produces summary statistics and a multi-line chart of all measures.
+
+**Usage**
+
+```r
+ik_compare(..., labels = NULL)
+```
+
+**Arguments**
+
+- `...` — One or more objects of class `"ik_core"`, as returned by `ik_core()`.
+- `labels` — Character vector or `NULL`. Labels for each measure. If `NULL`, labels are derived from each object's method name.
+
+**Returns**
+
+An S3 object of class `"ik_comparison"` with elements: measuresList of `ik_core` objects. labelsCharacter vector of labels.
+
+**Example**
+
+```r
+data <- ik_sample_data("components")
+core_tm <- ik_core(data, method = "trimmed_mean")
+core_wm <- ik_core(data, method = "weighted_median")
+core_ex <- ik_core(data, method = "exclusion", exclude = c("Food", "Transport"))
+
+comp <- ik_compare(core_tm, core_wm, core_ex)
+print(comp)
+plot(comp)
+```
+
+---
+
+## `ik_core()`
+
+**Compute core inflation measures**
+
+Estimates core (underlying) inflation using one of three standard methods: trimmed mean, weighted median, or exclusion-based. These measures aim to strip out transitory price movements and reveal the persistent trend.
+
+**Usage**
+
+```r
+ik_core(
+  data,
+  method = c("trimmed_mean", "weighted_median", "exclusion", "asymmetric_trim"),
+  trim = 0.08,
+  trim_lower = 0.24,
+  trim_upper = 0.31,
+  exclude = NULL,
+  date_col = "date",
+  item_col = "item",
+  change_col = "price_change",
+  weight_col = "weight"
+)
+```
+
+**Arguments**
+
+- `data` — A data.frame containing component-level inflation data.
+- `method` — Character. One of `"trimmed_mean"`, `"weighted_median"`, `"exclusion"`, or `"asymmetric_trim"`.
+- `trim` — Numeric. Fraction to trim from each tail (for `"trimmed_mean"` only). Default `0.08` (8% symmetric trim, following the Cleveland Fed).
+- `trim_lower` — Numeric. Fraction to trim from the lower tail (for `"asymmetric_trim"` only). Default `0.24`, matching the Dallas Fed trimmed mean PCE.
+- `trim_upper` — Numeric. Fraction to trim from the upper tail (for `"asymmetric_trim"` only). Default `0.31`, matching the Dallas Fed trimmed mean PCE.
+- `exclude` — Character vector. Items to exclude (for `"exclusion"` only).
+- `date_col` — Character. Name of the date column. Default `"date"`.
+- `item_col` — Character. Name of the item/component column. Default `"item"`.
+- `change_col` — Character. Name of the price change column. Default `"price_change"`.
+- `weight_col` — Character. Name of the weight column. Default `"weight"`.
+
+**Returns**
+
+An S3 object of class `"ik_core"` with elements: coredata.frame with columns: date, core_inflation. methodCharacter. The method used. trimNumeric. The trim fraction (if applicable). excludeCharacter vector. Excluded items (if applicable). headlinedata.frame with columns: date, headline.
+
+**Example**
+
+```r
+data <- ik_sample_data("components")
+
+# Trimmed mean (default)
+core_tm <- ik_core(data, method = "trimmed_mean")
+print(core_tm)
+
+# Weighted median
+core_wm <- ik_core(data, method = "weighted_median")
+print(core_wm)
+
+# Exclusion-based
+core_ex <- ik_core(data, method = "exclusion", exclude = c("Food", "Transport"))
+print(core_ex)
+```
+
+---
+
+## `ik_decompose()`
+
+**Decompose inflation into weighted component contributions**
+
+Computes the weighted contribution of each CPI component to headline inflation. The contribution of item i is `weight_i * price_change_i`, and headline inflation is the sum of all contributions for each period.
+
+**Usage**
+
+```r
+ik_decompose(
+  data,
+  date_col = "date",
+  item_col = "item",
+  change_col = "price_change",
+  weight_col = "weight"
+)
+```
+
+**Arguments**
+
+- `data` — A data.frame containing component-level inflation data.
+- `date_col` — Character. Name of the date column. Default `"date"`.
+- `item_col` — Character. Name of the item/component column. Default `"item"`.
+- `change_col` — Character. Name of the price change column. Default `"price_change"`.
+- `weight_col` — Character. Name of the weight column. Default `"weight"`.
+
+**Returns**
+
+An S3 object of class `"ik_decomposition"` with elements: contributionsdata.frame with columns: date, item, weight, price_change, contribution. headlinedata.frame with columns: date, headline_inflation.
+
+**Example**
+
+```r
+data <- ik_sample_data("components")
+decomp <- ik_decompose(data)
+print(decomp)
+plot(decomp)
+```
+
+---
+
+## `ik_diffusion()`
+
+**Compute an inflation diffusion index**
+
+Measures the breadth of price increases across CPI components. For each period, computes the (weighted or unweighted) fraction of items with price changes exceeding a threshold. A diffusion index above 0.5 indicates that more than half of items are experiencing above-threshold price increases.
+
+**Usage**
+
+```r
+ik_diffusion(
+  data,
+  threshold = c("zero", "mean", "target"),
+  target = 0.02,
+  weighted = TRUE,
+  date_col = "date",
+  item_col = "item",
+  change_col = "price_change",
+  weight_col = "weight"
+)
+```
+
+**Arguments**
+
+- `data` — A data.frame containing component-level inflation data.
+- `threshold` — Character. The threshold rule: `"zero"` (price_change > 0), `"mean"` (above the cross-sectional mean), or `"target"` (above an annualised target rate).
+- `target` — Numeric. Annualised inflation target (for `"target"` threshold only). Default `0.02` (2%).
+- `weighted` — Logical. If `TRUE` (default), compute the weighted fraction. If `FALSE`, compute the simple (unweighted) fraction.
+- `date_col` — Character. Name of the date column. Default `"date"`.
+- `item_col` — Character. Name of the item/component column. Default `"item"`.
+- `change_col` — Character. Name of the price change column. Default `"price_change"`.
+- `weight_col` — Character. Name of the weight column. Default `"weight"`.
+
+**Returns**
+
+An S3 object of class `"ik_diffusion"` with elements: diffusiondata.frame with columns: date, diffusion_index. thresholdCharacter. The threshold type used. weightedLogical. Whether weights were used.
+
+**Example**
+
+```r
+data <- ik_sample_data("components")
+
+# Fraction of items with rising prices
+d <- ik_diffusion(data, threshold = "zero")
+print(d)
+plot(d)
+```
+
+---
+
+## `ik_forecast_eval()`
+
+**Evaluate inflation forecasts**
+
+Runs standard forecast evaluation tests. The bias test (Mincer-Zarnowitz) checks whether forecasts are unbiased. The efficiency test (Nordhaus) checks whether forecast errors are autocorrelated. The Diebold-Mariano test compares predictive accuracy of two competing forecasts.
+
+**Usage**
+
+```r
+ik_forecast_eval(
+  actual,
+  forecast,
+  test = c("bias", "efficiency", "dm"),
+  forecast2 = NULL,
+  horizon = 1L,
+  alternative = c("two.sided", "less", "greater")
+)
+```
+
+**Arguments**
+
+- `actual` — Numeric vector. Realised inflation values.
+- `forecast` — Numeric vector. Forecast values, same length as `actual`.
+- `test` — Character. One of `"bias"`, `"efficiency"`, or `"dm"`.
+- `forecast2` — Numeric vector or `NULL`. Second forecast series (required for `"dm"` test), same length as `actual`.
+- `horizon` — Integer. Forecast horizon (used for Newey-West bandwidth in the DM test). Default `1`.
+- `alternative` — Character. Alternative hypothesis for the DM test: `"two.sided"`, `"less"`, or `"greater"`.
+
+**Returns**
+
+An S3 object of class `"ik_forecast_eval"` with elements: testCharacter. The test performed. statisticNumeric. The test statistic. p_valueNumeric. The p-value. coefficientsNamed numeric vector (for bias and efficiency tests). conclusionCharacter. A plain-language summary of the result.
+
+**Example**
+
+```r
+set.seed(42)
+data <- ik_sample_data("headline")
+actual <- data$inflation[5:80]
+forecast1 <- data$inflation[4:79] + rnorm(76, 0, 0.2)
+forecast2 <- data$inflation[4:79] + rnorm(76, 0, 0.4)
+
+# Mincer-Zarnowitz bias test
+bias <- ik_forecast_eval(actual, forecast1, test = "bias")
+print(bias)
+
+# Diebold-Mariano test
+dm <- ik_forecast_eval(actual, forecast1, test = "dm", forecast2 = forecast2)
+print(dm)
+```
+
+---
+
+## `ik_persistence()`
+
+**Measure inflation persistence**
+
+Estimates the degree of persistence in an inflation series using one of three methods: sum of AR coefficients, half-life, or largest autoregressive root.
+
+**Usage**
+
+```r
+ik_persistence(
+  x,
+  method = c("sum_ar", "half_life", "largest_root"),
+  ar_order = NULL,
+  max_order = 12L,
+  ic = c("bic", "aic")
+)
+```
+
+**Arguments**
+
+- `x` — Numeric vector. An inflation time series.
+- `method` — Character. One of `"sum_ar"`, `"half_life"`, or `"largest_root"`.
+- `ar_order` — Integer or `NULL`. The AR order to fit. If `NULL`, order is selected automatically using the information criterion specified by `ic`.
+- `max_order` — Integer. Maximum AR order to consider when selecting automatically. Default `12`.
+- `ic` — Character. Information criterion for order selection: `"bic"` or `"aic"`. Default `"bic"`.
+
+**Returns**
+
+An S3 object of class `"ik_persistence"` with elements: valueNumeric. The persistence measure. methodCharacter. The method used. ar_orderInteger. The AR order fitted. ar_coefficientsNumeric vector. The estimated AR coefficients. interpretationCharacter. A plain-language interpretation ("High persistence", "Moderate persistence", or "Low persistence").
+
+**Example**
+
+```r
+data <- ik_sample_data("headline")
+p <- ik_persistence(data$inflation, method = "sum_ar")
+print(p)
+
+p_hl <- ik_persistence(data$inflation, method = "half_life")
+print(p_hl)
+```
+
+---
+
+## `ik_phillips()`
+
+**Estimate a Phillips curve**
+
+Fits a Phillips curve relating inflation to an economic slack measure (output gap or unemployment rate). Supports traditional, expectations- augmented, and hybrid specifications.
+
+**Usage**
+
+```r
+ik_phillips(
+  inflation,
+  slack,
+  expectations = NULL,
+  type = c("traditional", "expectations_augmented", "hybrid"),
+  lags = 4L,
+  robust_se = FALSE
+)
+```
+
+**Arguments**
+
+- `inflation` — Numeric vector. Inflation rate series.
+- `slack` — Numeric vector. Slack measure (output gap or unemployment rate), same length as `inflation`.
+- `expectations` — Numeric vector or `NULL`. Inflation expectations series, required for `"expectations_augmented"` and `"hybrid"` types. Must be the same length as `inflation`.
+- `type` — Character. Phillips curve specification: `"traditional"`, `"expectations_augmented"`, or `"hybrid"`.
+- `lags` — Integer. Number of lagged inflation terms to include. Default `4`.
+- `robust_se` — Logical or character. If `FALSE`, use OLS standard errors. If `TRUE` or `"HC1"`, compute HC1 heteroskedasticity-robust standard errors. If `"HAC"`, compute Newey-West heteroskedasticity and autocorrelation consistent standard errors with automatic bandwidth selection (Newey and West, 1994). Default `FALSE`.
+
+**Returns**
+
+An S3 object of class `"ik_phillips"` with elements: coefficientsNamed numeric vector of estimated coefficients. std_errorsNamed numeric vector of standard errors. p_valuesNamed numeric vector of p-values. r_squaredNumeric. R-squared of the regression. typeCharacter. The Phillips curve type. slope_estimateNumeric. The estimated slope on the slack variable. n_obsInteger. Number of observations used. residualsNumeric vector. Regression residuals.
+
+**Example**
+
+```r
+data <- ik_sample_data("headline")
+pc <- ik_phillips(data$inflation, data$unemployment, type = "traditional")
+print(pc)
+plot(pc)
+```
+
+---
+
+## `ik_sample_data()`
+
+**Generate sample inflation data**
+
+Creates synthetic data for testing and demonstrating inflationkit functions. Two types are available: component-level CPI data and headline macro data.
+
+**Usage**
+
+```r
+ik_sample_data(type = c("components", "headline"))
+```
+
+**Arguments**
+
+- `type` — Character. Either `"components"` for item-level CPI data with weights and price changes, or `"headline"` for quarterly macro data with inflation, output gap, and unemployment.
+
+**Returns**
+
+A data.frame. For `"components"`: columns `date`, `item`, `weight`, `price_change` (120 months, 10 items, 1200 rows). For `"headline"`: columns `date`, `inflation`, `output_gap`, `unemployment` (80 quarterly observations).
+
+**Example**
+
+```r
+comp <- ik_sample_data("components")
+head(comp)
+
+macro <- ik_sample_data("headline")
+head(macro)
+```
+
+---
+
+## `ik_sticky_flexible()`
+
+**Decompose inflation into sticky and flexible components**
+
+Splits CPI components into sticky-price and flexible-price categories based on a user-provided classification, then computes separate weighted inflation measures for each group. This follows the Atlanta Fed methodology.
+
+**Usage**
+
+```r
+ik_sticky_flexible(
+  data,
+  classification,
+  date_col = "date",
+  item_col = "item",
+  change_col = "price_change",
+  weight_col = "weight"
+)
+```
+
+**Arguments**
+
+- `data` — A data.frame containing component-level inflation data.
+- `classification` — A named logical vector or a data.frame. If a named logical vector, names correspond to item names and `TRUE` indicates sticky. If a data.frame, it must have columns `item` (character) and `sticky` (logical).
+- `date_col` — Character. Name of the date column. Default `"date"`.
+- `item_col` — Character. Name of the item/component column. Default `"item"`.
+- `change_col` — Character. Name of the price change column. Default `"price_change"`.
+- `weight_col` — Character. Name of the weight column. Default `"weight"`.
+
+**Returns**
+
+An S3 object of class `"ik_sticky_flex"` with elements: resultdata.frame with columns: date, sticky, flexible, headline. classificationNamed logical vector mapping items to sticky/flexible.
+
+**Example**
+
+```r
+data <- ik_sample_data("components")
+# Classify items
+class_vec <- c(
+  Food = FALSE, Housing = TRUE, Transport = FALSE,
+  Clothing = FALSE, Health = TRUE, Education = TRUE,
+  Communication = TRUE, Recreation = FALSE,
+  Restaurants = TRUE, Other = FALSE
+)
+sf <- ik_sticky_flexible(data, classification = class_vec)
+print(sf)
+plot(sf)
+```
+
+---
+
+## `ik_trend()`
+
+**Estimate trend inflation**
+
+Extracts the trend component from an inflation series using one of four methods: Hodrick-Prescott filter, Beveridge-Nelson decomposition, exponential smoothing, or centred moving average.
+
+**Usage**
+
+```r
+ik_trend(
+  x,
+  method = c("hp", "beveridge_nelson", "exponential_smooth", "moving_average"),
+  frequency = c("quarterly", "monthly", "annual"),
+  lambda = NULL,
+  window = NULL
+)
+```
+
+**Arguments**
+
+- `x` — Numeric vector. An inflation time series.
+- `method` — Character. One of `"hp"`, `"beveridge_nelson"`, `"exponential_smooth"`, or `"moving_average"`.
+- `frequency` — Character. Data frequency: `"quarterly"` (default), `"monthly"`, or `"annual"`. Used to set the HP filter lambda (when `lambda = NULL`) and moving average window (when `window = NULL`).
+- `lambda` — Numeric or `NULL`. Smoothing parameter for the HP filter. If `NULL`, defaults based on `frequency`: 6.25 for annual, 1600 for quarterly (Hodrick and Prescott, 1997), or 14400 for monthly (Backus and Kehoe, 1992).
+- `window` — Integer or `NULL`. Window size for the moving average method. Defaults to 4 for quarterly, 12 for monthly, or 3 for annual.
+
+**Returns**
+
+An S3 object of class `"ik_trend"` with elements: trendNumeric vector. The estimated trend component. cycleNumeric vector. The cyclical component (original minus trend). methodCharacter. The method used. lambdaNumeric. HP filter lambda (if applicable). windowInteger. Moving average window (if applicable). alphaNumeric. Exponential smoothing parameter (if applicable). originalNumeric vector. The original series.
+
+**Example**
+
+```r
+data <- ik_sample_data("headline")
+tr <- ik_trend(data$inflation, method = "hp")
+print(tr)
+plot(tr)
+
+tr_ma <- ik_trend(data$inflation, method = "moving_average", window = 4)
+print(tr_ma)
+```
+
+---
+

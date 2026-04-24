@@ -2,6 +2,8 @@
 
 > Tools for analysing inflation dynamics. Install with `install.packages("inflationkit")`.
 
+Full API reference (for agents): https://raw.githubusercontent.com/charlescoverdale/inflationkit/main/llms-full.txt
+
 Version: 0.1.0. License: MIT.
 
 ## Functions
