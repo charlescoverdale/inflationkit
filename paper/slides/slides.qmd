@@ -1,0 +1,352 @@
+---
+title: "inflationkit"
+subtitle: "Inflation decomposition, persistence, and Phillips curves in R"
+author: "Charles Coverdale"
+institute: "London, United Kingdom"
+date: "2026-05-01"
+date-format: "MMMM YYYY"
+format:
+  beamer:
+    aspectratio: 169
+    fontsize: 11pt
+    navigation: empty
+    theme: default
+    colortheme: default
+    fonttheme: default
+    pdf-engine: xelatex
+    include-in-header: header.tex
+    slide-level: 2
+    keep-tex: false
+    fig-align: center
+    classoption:
+      - t
+---
+
+
+## The question
+
+\vspace{1.5em}
+
+\begin{center}
+\Large\bfseries\color{econblue}
+How does an applied economist run the standard\\[0.1em]
+inflation diagnostic playbook in one R package?
+\end{center}
+
+\vspace{1em}
+
+\begin{center}
+\normalsize\itshape
+Eleven functions, one \texttt{ik\_} prefix, every dataset in any country.
+\end{center}
+
+::: notes
+Open with the question, not the package. Inflation analysis splits into
+five workflows that have lived in disconnected scripts and spreadsheets:
+decomposition, core measures, persistence, Phillips curves, forecast
+evaluation. inflationkit unifies them. 30 seconds.
+:::
+
+
+## Why it matters
+
+- **Central banks** (Fed, ECB, BoE) report core, trim, persistence and Phillips curve estimates in every quarterly briefing
+- **Sovereign treasuries and OBR-equivalents** track breakeven inflation and forecast bias for fiscal projections
+- **Research departments** (NBER, CEPR, IMF) need replicable persistence and slope estimates across countries
+- **Financial press and policy analysts** decompose headline spikes into supply versus demand each release day
+
+::: notes
+Four distinct stakeholder groups, four routine use cases. Point at the
+2021-2023 episode: every central bank ran exactly this playbook. 60 seconds.
+:::
+
+
+## What is already out there
+
+- **`Inflation`** (CRAN): four core measures only, no decomposition, persistence, Phillips curves, or forecast evaluation; unmaintained since 2017\footnote{\scriptsize Iturbide \& Tovar (2017), \textit{Inflation: Core Inflation}, R package v1.4.}
+- **Spreadsheet workbooks**: every applied team has its own; no version control, no testing, no citation
+- **Bespoke scripts**: persistence and Phillips curve code is rewritten in every paper
+- **Proprietary platforms** (Haver, Bloomberg): closed source, no transparency, no reproducibility
+
+\vspace{0.5em}
+
+The gap: **no single CRAN package covers the standard inflation workflow end to end**.
+
+::: notes
+Respect the existing CRAN package; it is narrow but solid for what it
+covers. The gap is breadth and currency, not quality. 45 seconds.
+:::
+
+
+## What inflationkit offers
+
+1. **Coverage**: 11 functions across decomposition, core, persistence, Phillips curves, trend extraction, breakeven, and forecast evaluation
+2. **Interface**: every function accepts arbitrary column names and returns an S3 object with a `print()` method; `rbind()` composes panels
+3. **Provenance**: pure R, no compiled code, no API calls, no bundled data; over 200 tests; CRAN since March 2026
+
+\vspace{0.5em}
+
+Methods follow @bryan1994measuring (core), @pivetta2007persistence (persistence), @stock2007why (trend), @mincer1969evaluation (forecast eval)\footnote{\scriptsize Bryan \& Cecchetti (1994), \textit{Measuring core inflation}, NBER WP 4303.}.
+
+::: notes
+Three bullets, three selling points. Pure-computation design lets users
+plug ONS, Eurostat, BLS, ABS data straight in. CRAN presence signals
+maturity. 45 seconds.
+:::
+
+
+## Decomposition: what is driving headline inflation
+
+```{=latex}
+\begin{center}
+\includegraphics[height=0.65\textheight]{figures/fig2_decompose.pdf}
+\end{center}
+
+\vspace{-0.4em}
+
+{\footnotesize\itshape Component contributions sum to headline. Energy and transport drove the 2021-2022 peak; housing contributes slowly throughout. Exports: \texttt{ik\_decompose()}, \texttt{ik\_diffusion()}.}
+```
+
+::: notes
+First family. The component stack is the first slide of any inflation
+briefing. Pandemic peak energy-led, persistent housing component
+underneath. 25 seconds.
+:::
+
+
+## Core measures: four ways to strip the noise
+
+```{=latex}
+\begin{center}
+\includegraphics[height=0.65\textheight]{figures/fig3_core_comparison.pdf}
+\end{center}
+
+\vspace{-0.4em}
+
+{\footnotesize\itshape Trimmed mean, weighted median, exclusion, asymmetric trim. Distribution-based measures attenuate the spike more than fixed exclusion. Exports: \texttt{ik\_core()}, \texttt{ik\_sticky\_flexible()}.}
+```
+
+::: notes
+Second family. Bryan-Cecchetti programme: distribution-based cores beat
+ex-food-and-energy because the high-variance components shift period
+to period. Cleveland Fed has published trim CPI for 30 years. 25 seconds.
+:::
+
+
+## Phillips curves: slack, expectations, and the slope
+
+```{=latex}
+\begin{center}
+\includegraphics[height=0.65\textheight]{figures/fig4_phillips.pdf}
+\end{center}
+
+\vspace{-0.4em}
+
+{\footnotesize\itshape Traditional, expectations-augmented, and hybrid New Keynesian forms with HAC standard errors. Exports: \texttt{ik\_phillips()}, \texttt{ik\_persistence()}, \texttt{ik\_breakeven()}.}
+```
+
+::: notes
+Third family. Phillips curve is weakly identified in aggregate data
+(Mavroeidis et al 2014). Single-equation OLS is a starting diagnostic;
+structural inference needs cross-sectional designs. 25 seconds.
+:::
+
+
+## Central formulas
+
+\vspace{0.3em}
+
+\textbf{Persistence} (sum of AR coefficients):
+\begin{equation}
+\rho \;=\; \sum_{j=1}^{p} \phi_j, \qquad \pi_t = c + \sum_{j=1}^{p}\phi_j \pi_{t-j} + \varepsilon_t
+\end{equation}
+
+\textbf{Phillips curve} (hybrid New Keynesian):
+\begin{equation}
+\pi_t = \alpha + \beta_f\,\mathbb{E}_t \pi_{t+1} + \beta_b\,\pi_{t-1} + \gamma\,x_t + \varepsilon_t
+\end{equation}
+
+\textbf{Mincer-Zarnowitz} (forecast bias):
+\begin{equation}
+\pi_t = \alpha + \beta\,\hat{\pi}_t + \varepsilon_t, \qquad H_0:\ (\alpha,\beta) = (0, 1)
+\end{equation}
+
+::: notes
+Three equations, one idea each. Persistence is one number summarising
+mean-reversion speed. Phillips curve nests three specifications. MZ is
+the bias test every published forecast should pass. 60 seconds.
+:::
+
+
+## Package at a glance
+
+::: columns
+::: {.column width="58%"}
+
+Function families:
+
+- **Decomposition**: `ik_decompose`, `ik_core`, `ik_sticky_flexible`, `ik_diffusion`
+- **Dynamics**: `ik_persistence`, `ik_phillips`
+- **Trend**: `ik_trend` (HP, BN, exponential, MA)
+- **Breakeven**: `ik_breakeven`
+- **Forecast eval**: `ik_forecast_eval` (MZ, Nordhaus, DM)
+- **Helpers**: `ik_compare`, `ik_sample_data`
+
+Deps: `cli`, `grDevices`, `graphics`, `stats`. R $\geq$ 4.1.0.
+
+:::
+::: {.column width="40%"}
+
+\begin{block}{Flexible column names}
+Every function accepts:
+
+\texttt{date\_col} | \texttt{item\_col} | \texttt{weight\_col} | \texttt{price\_col}
+
+ONS, Eurostat, BLS, ABS data flows in without reshaping.
+\end{block}
+
+:::
+:::
+
+::: notes
+Two columns. Eleven exports across five families. The flexible-column
+interface is the practical pitch: data from any agency, no reshaping
+needed. 45 seconds.
+:::
+
+
+## Minimal working example
+
+```r
+library(inflationkit)
+
+# Five-line canonical workflow
+d <- ik_sample_data("components")
+
+ik_decompose(d)                                          # contributions
+ik_core(d, method = "trimmed_mean", trim = 0.08)         # core
+ik_persistence(headline_series)                          # half-life
+ik_phillips(inflation = infl, slack = output_gap,        # PC slope
+            type = "traditional", robust_se = "HAC")
+```
+
+\footnotesize
+Each call returns an S3 object with a `print()` method. Outputs compose
+via `rbind()` for panel-style analysis across countries or vintages.
+
+::: notes
+Live-read the code. Five lines, five S3 objects, every diagnostic a
+central bank reports. The HAC option is the default robustness adjust-
+ment for serially-correlated residuals. 60 seconds.
+:::
+
+
+## Case study: the pandemic-era playbook on US CPI
+
+**Data.** FRED series \texttt{CPIAUCSL} (headline) and \texttt{CPILFESL} (less food and energy), monthly, 2015 to 2026.
+
+**Question.** *Was the 2021-2023 spike a relative-price shock or a regime shift in trend inflation?*
+
+**Why this case.** Largest test of inflation targeting in three decades. Every central bank ran exactly this diagnostic sequence in real time\footnote{\scriptsize Reis (2022), \textit{The burst of high inflation}, NBER WP 30616. Shapiro (2022), \textit{Decomposing supply and demand driven inflation}, FRBSF WP.}.
+
+::: notes
+Setup slide. No results. Name the data, the period, the question. Point
+forward to the hero figure. 45 seconds.
+:::
+
+
+## US CPI, 2015 to 2026: headline, core, and HP trend
+
+```{=latex}
+\begin{center}
+\includegraphics[height=0.68\textheight]{figures/fig6_fred.pdf}
+\end{center}
+
+\vspace{-0.2em}
+
+{\footnotesize\itshape Headline (grey) peaks above 9 per cent in June 2022; core (blue) peaks at 6.7 per cent. HP trend (red dashed) captures the regime shift. \texttt{ik\_persistence()} on year-over-year headline returns sum-of-AR = 0.97. Source: FRED.}
+```
+
+::: notes
+The money slide. Ninety seconds. Walk through the three series:
+headline spike, core attenuation, trend regime shift. The 0.97
+persistence reading is exactly what Stock-Watson 2007 warn about:
+unfiltered inflation looks near-permanent because the local mean
+has drifted. Pair persistence with trend before drawing conclusions.
+Pause before moving on.
+:::
+
+
+## Mincer-Zarnowitz: a naive AR(1) forecast was biased through the spike
+
+```{=latex}
+\begin{center}
+\includegraphics[height=0.68\textheight]{figures/fig5_mz.pdf}
+\end{center}
+
+\vspace{-0.5em}
+
+{\footnotesize\itshape Realised inflation against an AR(1)-with-drift forecast, 120 months synthetic data. Slope below unity, intercept off zero: under-reaction and bias. \texttt{ik\_forecast\_eval()} returns the test statistic and joint $p$-value.}
+```
+
+::: notes
+Secondary analytic. The same package that decomposed and trended
+inflation also evaluates whether your forecast caught the spike.
+Most simple time-series forecasts under-reacted in 2021-2022. MZ is
+the standard pre-commitment test before publishing any forecast. 60 seconds.
+:::
+
+
+## What inflationkit does not yet do
+
+- **Single-equation OLS only**: no IV, no GMM, no @hazell2022slope cross-sectional design
+- **No bundled price data**: pure computation; data still comes from ONS, Eurostat, BLS, ABS
+- **No regional decomposition**: the package operates at the country level
+- **No DSGE-style structural inference**: that is the job of `dynare4r` or bespoke Stan code
+
+\vspace{0.5em}
+
+**v0.2.0 roadmap**: regional Phillips curve panel estimators (HSL-style cross-sectional design), expanded breakeven options across maturities, sticky-flexible helpers for the full Atlanta Fed component map.
+
+::: notes
+Honest limitations. The aggregate Phillips curve slope is weakly
+identified; the package fits the diagnostic OLS but flags this in
+the documentation. Frame v0.2.0 as a commitment. 45 seconds.
+:::
+
+
+## Contact, code, paper
+
+::: columns
+::: {.column width="62%"}
+
+```{=latex}
+{\large\bfseries Charles Coverdale\par}
+\vspace{0.5em}
+\texttt{charles.f.coverdale@gmail.com}\\
+\texttt{github.com/charlescoverdale/inflationkit}\\
+\texttt{charlescoverdale.github.io/publications}
+\vspace{0.9em}
+
+\textbf{Acknowledgements.} CPI data: Federal Reserve Bank of St.\ Louis (FRED, public). Methodological debts to Bryan, Cecchetti, Pivetta, Stock, Watson, Mincer, Zarnowitz, Diebold, Mariano, Hodrick, Prescott, and the Cleveland Fed trim-CPI team. Thanks to CRAN maintainers and reviewers of \emph{inflationkit} v0.1.0.
+```
+
+:::
+::: {.column width="35%"}
+
+\begin{center}
+\includegraphics[width=0.85\linewidth]{figures/qrcode_paper.png}
+
+\vspace{0.3em}
+
+{\footnotesize\itshape Scan for paper PDF}
+\end{center}
+
+:::
+:::
+
+::: notes
+Close cleanly. Name, email, GitHub, publications URL. QR code points
+straight to the paper PDF. Acknowledge the methodological lineage.
+Open for questions.
+:::
