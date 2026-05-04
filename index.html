@@ -219,24 +219,24 @@
 <col width="42%">
 <col width="57%">
 </colgroup>
-<thead><tr class="header">
+<thead><tr>
 <th>Column</th>
 <th>What it is</th>
 </tr></thead>
 <tbody>
-<tr class="odd">
+<tr>
 <td><code>date</code></td>
 <td>Date of the observation (e.g. <code>2024-01-01</code>)</td>
 </tr>
-<tr class="even">
+<tr>
 <td><code>item</code></td>
 <td>Component name (e.g. <code>"Food"</code>, <code>"Housing"</code>, <code>"Transport"</code>)</td>
 </tr>
-<tr class="odd">
+<tr>
 <td><code>weight</code></td>
 <td>CPI basket weight as a proportion (0.15 = 15%). Should sum to 1 within each date. If they do not, functions normalise them internally.</td>
 </tr>
-<tr class="even">
+<tr>
 <td><code>price_change</code></td>
 <td>Period-on-period price change as a decimal (0.003 = 0.3% monthly inflation). Positive means prices are rising.</td>
 </tr>
@@ -314,38 +314,38 @@
 <col width="27%">
 <col width="51%">
 </colgroup>
-<thead><tr class="header">
+<thead><tr>
 <th>Source</th>
 <th>Coverage</th>
 <th>How to get into R</th>
 </tr></thead>
 <tbody>
-<tr class="odd">
+<tr>
 <td>ONS (UK CPI)</td>
 <td>United Kingdom</td>
 <td><a href="https://cran.r-project.org/package=ons" class="external-link">ons</a></td>
 </tr>
-<tr class="even">
+<tr>
 <td>BLS (US CPI)</td>
 <td>United States</td>
 <td><a href="https://cran.r-project.org/package=fred" class="external-link">fred</a></td>
 </tr>
-<tr class="odd">
+<tr>
 <td>ECB (HICP)</td>
 <td>Euro area</td>
 <td><a href="https://cran.r-project.org/package=readecb" class="external-link">readecb</a></td>
 </tr>
-<tr class="even">
+<tr>
 <td>OECD</td>
 <td>38 countries</td>
 <td><a href="https://cran.r-project.org/package=readoecd" class="external-link">readoecd</a></td>
 </tr>
-<tr class="odd">
+<tr>
 <td>World Bank</td>
 <td>200+ countries</td>
 <td>WDI package</td>
 </tr>
-<tr class="even">
+<tr>
 <td>Statistics offices</td>
 <td>Any country</td>
 <td>Download CSV from national statistics website</td>
@@ -362,52 +362,52 @@
 <col width="43%">
 <col width="56%">
 </colgroup>
-<thead><tr class="header">
+<thead><tr>
 <th>Function</th>
 <th>Description</th>
 </tr></thead>
 <tbody>
-<tr class="odd">
+<tr>
 <td><code><a href="reference/ik_decompose.html">ik_decompose()</a></code></td>
 <td>Weighted contributions of CPI components to headline inflation</td>
 </tr>
-<tr class="even">
+<tr>
 <td><code><a href="reference/ik_core.html">ik_core()</a></code></td>
 <td>Core inflation (trimmed mean, weighted median, exclusion, asymmetric trim)</td>
 </tr>
-<tr class="odd">
+<tr>
 <td><code><a href="reference/ik_sticky_flexible.html">ik_sticky_flexible()</a></code></td>
 <td>Sticky vs flexible price decomposition (Atlanta Fed methodology)</td>
 </tr>
-<tr class="even">
+<tr>
 <td><code><a href="reference/ik_persistence.html">ik_persistence()</a></code></td>
 <td>Inflation persistence (sum of AR coefficients, half-life, largest root)</td>
 </tr>
-<tr class="odd">
+<tr>
 <td><code><a href="reference/ik_diffusion.html">ik_diffusion()</a></code></td>
 <td>Diffusion index (fraction of items with rising prices)</td>
 </tr>
-<tr class="even">
+<tr>
 <td><code><a href="reference/ik_phillips.html">ik_phillips()</a></code></td>
 <td>Phillips curve estimation (traditional, expectations-augmented, hybrid)</td>
 </tr>
-<tr class="odd">
+<tr>
 <td><code><a href="reference/ik_breakeven.html">ik_breakeven()</a></code></td>
 <td>Breakeven inflation from nominal and real bond yields</td>
 </tr>
-<tr class="even">
+<tr>
 <td><code><a href="reference/ik_trend.html">ik_trend()</a></code></td>
 <td>Trend extraction (HP filter, Beveridge-Nelson, exponential smoothing, moving average)</td>
 </tr>
-<tr class="odd">
+<tr>
 <td><code><a href="reference/ik_forecast_eval.html">ik_forecast_eval()</a></code></td>
 <td>Forecast evaluation (Mincer-Zarnowitz bias, Nordhaus efficiency, Diebold-Mariano)</td>
 </tr>
-<tr class="even">
+<tr>
 <td><code><a href="reference/ik_compare.html">ik_compare()</a></code></td>
 <td>Compare multiple core inflation measures side by side</td>
 </tr>
-<tr class="odd">
+<tr>
 <td><code><a href="reference/ik_sample_data.html">ik_sample_data()</a></code></td>
 <td>Built-in sample CPI and macro data for examples</td>
 </tr>
@@ -436,26 +436,38 @@
 <col width="40%">
 <col width="59%">
 </colgroup>
-<thead><tr class="header">
+<thead><tr>
 <th>Package</th>
 <th>Description</th>
 </tr></thead>
 <tbody>
-<tr class="odd">
+<tr>
 <td><a href="https://github.com/charlescoverdale/inflateR" class="external-link">inflateR</a></td>
-<td>Adjust monetary values for inflation</td>
+<td>Adjust monetary values for inflation (simpler companion)</td>
 </tr>
-<tr class="even">
+<tr>
 <td><a href="https://github.com/charlescoverdale/ons" class="external-link">ons</a></td>
-<td>UK Office for National Statistics data (includes CPI)</td>
+<td>UK Office for National Statistics data (CPI, RPI, GDP deflator)</td>
 </tr>
-<tr class="odd">
+<tr>
 <td><a href="https://github.com/charlescoverdale/fred" class="external-link">fred</a></td>
 <td>Federal Reserve Economic Data (includes US CPI)</td>
 </tr>
-<tr class="even">
+<tr>
 <td><a href="https://github.com/charlescoverdale/readecb" class="external-link">readecb</a></td>
 <td>European Central Bank data (includes HICP)</td>
+</tr>
+<tr>
+<td><a href="https://github.com/charlescoverdale/readoecd" class="external-link">readoecd</a></td>
+<td>OECD international price data</td>
+</tr>
+<tr>
+<td><a href="https://github.com/charlescoverdale/nowcast" class="external-link">nowcast</a></td>
+<td>Economic nowcasting (inflation nowcasts)</td>
+</tr>
+<tr>
+<td><a href="https://github.com/charlescoverdale/mpshock" class="external-link">mpshock</a></td>
+<td>Monetary policy shock series</td>
 </tr>
 </tbody>
 </table>

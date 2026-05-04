@@ -8,6 +8,7 @@ Phillips curves, and extract the underlying trend from noisy price data.
 ## Installation
 
 ``` r
+
 install.packages("inflationkit")
 
 # Or install the development version from GitHub
@@ -16,6 +17,7 @@ devtools::install_github("charlescoverdale/inflationkit")
 ```
 
 ``` r
+
 library(inflationkit)
 
 # Built-in sample data: 10 CPI components, 120 months
@@ -59,6 +61,7 @@ component. This tells you how many percentage points each category
 (food, housing, transport, etc.) is adding to the total.
 
 ``` r
+
 d <- ik_sample_data("components")
 decomp <- ik_decompose(d)
 decomp
@@ -78,6 +81,7 @@ exclude each month). The exclusion method and asymmetric trim use fixed
 rules.
 
 ``` r
+
 d <- ik_sample_data("components")
 
 # Cleveland Fed style: symmetric 8% trim
@@ -105,6 +109,7 @@ Measure how quickly inflation returns to its mean after a shock. High
 persistence means rate hikes take longer to bring inflation down.
 
 ``` r
+
 d <- ik_sample_data("headline")
 
 pers <- ik_persistence(d$inflation, method = "sum_ar")
@@ -127,6 +132,7 @@ Estimate the relationship between inflation and unemployment. A negative
 slope means higher unemployment is associated with lower inflation.
 
 ``` r
+
 d <- ik_sample_data("headline")
 
 pc <- ik_phillips(d$inflation, d$unemployment, type = "traditional", lags = 4)
@@ -149,6 +155,7 @@ Separate the permanent trend from transitory shocks using the
 Hodrick-Prescott filter or Beveridge-Nelson decomposition.
 
 ``` r
+
 d <- ik_sample_data("headline")
 
 hp <- ik_trend(d$inflation, method = "hp")
@@ -171,6 +178,7 @@ Test whether forecasts are unbiased (Mincer-Zarnowitz) or compare two
 competing forecasts (Diebold-Mariano).
 
 ``` r
+
 actual <- c(2.1, 2.3, 2.5, 2.2, 2.8, 3.0, 2.7, 2.4)
 forecast1 <- c(2.0, 2.2, 2.3, 2.1, 2.5, 2.8, 2.6, 2.3)
 forecast2 <- c(1.8, 2.0, 2.6, 2.3, 2.4, 3.2, 2.5, 2.1)
@@ -196,18 +204,19 @@ Most functions take a data frame with CPI components. Each row is one
 item in one period. The default column names are `date`, `item`,
 `weight`, and `price_change`:
 
-| Column         | What it is                                                                                                                             |
-|----------------|----------------------------------------------------------------------------------------------------------------------------------------|
-| `date`         | Date of the observation (e.g. `2024-01-01`)                                                                                            |
-| `item`         | Component name (e.g. `"Food"`, `"Housing"`, `"Transport"`)                                                                             |
-| `weight`       | CPI basket weight as a proportion (0.15 = 15%). Should sum to 1 within each date. If they do not, functions normalise them internally. |
-| `price_change` | Period-on-period price change as a decimal (0.003 = 0.3% monthly inflation). Positive means prices are rising.                         |
+| Column | What it is |
+|----|----|
+| `date` | Date of the observation (e.g. `2024-01-01`) |
+| `item` | Component name (e.g. `"Food"`, `"Housing"`, `"Transport"`) |
+| `weight` | CPI basket weight as a proportion (0.15 = 15%). Should sum to 1 within each date. If they do not, functions normalise them internally. |
+| `price_change` | Period-on-period price change as a decimal (0.003 = 0.3% monthly inflation). Positive means prices are rising. |
 
 If your data uses different column names, every function has `date_col`,
 `item_col`, `weight_col`, and `change_col` arguments so you can map
 them:
 
 ``` r
+
 # Your data has columns: month, category, share, pct_change
 ik_decompose(my_data,
              date_col = "month", item_col = "category",
@@ -223,6 +232,7 @@ The package includes sample datasets so you can try everything
 immediately:
 
 ``` r
+
 library(inflationkit)
 
 # Component-level data: 10 CPI items, 120 months
@@ -243,6 +253,7 @@ head(h)
 ### Option 2: Pull UK CPI data from the ONS
 
 ``` r
+
 # 1. Install the data package (one time)
 install.packages("ons")
 
@@ -259,6 +270,7 @@ library(inflationkit)
 ### Option 3: Pull US CPI data from FRED
 
 ``` r
+
 # 1. Install the data package (one time)
 install.packages("fred")
 
@@ -277,30 +289,30 @@ transport <- fred_series("CPITRNSL")  # Transportation
 
 ### Where to find CPI data
 
-| Source             | Coverage       | How to get into R                                       |
-|--------------------|----------------|---------------------------------------------------------|
-| ONS (UK CPI)       | United Kingdom | [ons](https://cran.r-project.org/package=ons)           |
-| BLS (US CPI)       | United States  | [fred](https://cran.r-project.org/package=fred)         |
-| ECB (HICP)         | Euro area      | [readecb](https://cran.r-project.org/package=readecb)   |
-| OECD               | 38 countries   | [readoecd](https://cran.r-project.org/package=readoecd) |
-| World Bank         | 200+ countries | WDI package                                             |
-| Statistics offices | Any country    | Download CSV from national statistics website           |
+| Source | Coverage | How to get into R |
+|----|----|----|
+| ONS (UK CPI) | United Kingdom | [ons](https://cran.r-project.org/package=ons) |
+| BLS (US CPI) | United States | [fred](https://cran.r-project.org/package=fred) |
+| ECB (HICP) | Euro area | [readecb](https://cran.r-project.org/package=readecb) |
+| OECD | 38 countries | [readoecd](https://cran.r-project.org/package=readoecd) |
+| World Bank | 200+ countries | WDI package |
+| Statistics offices | Any country | Download CSV from national statistics website |
 
 ## Functions
 
-| Function                                                                                                  | Description                                                                           |
-|-----------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------|
-| [`ik_decompose()`](https://charlescoverdale.github.io/inflationkit/reference/ik_decompose.md)             | Weighted contributions of CPI components to headline inflation                        |
-| [`ik_core()`](https://charlescoverdale.github.io/inflationkit/reference/ik_core.md)                       | Core inflation (trimmed mean, weighted median, exclusion, asymmetric trim)            |
-| [`ik_sticky_flexible()`](https://charlescoverdale.github.io/inflationkit/reference/ik_sticky_flexible.md) | Sticky vs flexible price decomposition (Atlanta Fed methodology)                      |
-| [`ik_persistence()`](https://charlescoverdale.github.io/inflationkit/reference/ik_persistence.md)         | Inflation persistence (sum of AR coefficients, half-life, largest root)               |
-| [`ik_diffusion()`](https://charlescoverdale.github.io/inflationkit/reference/ik_diffusion.md)             | Diffusion index (fraction of items with rising prices)                                |
-| [`ik_phillips()`](https://charlescoverdale.github.io/inflationkit/reference/ik_phillips.md)               | Phillips curve estimation (traditional, expectations-augmented, hybrid)               |
-| [`ik_breakeven()`](https://charlescoverdale.github.io/inflationkit/reference/ik_breakeven.md)             | Breakeven inflation from nominal and real bond yields                                 |
-| [`ik_trend()`](https://charlescoverdale.github.io/inflationkit/reference/ik_trend.md)                     | Trend extraction (HP filter, Beveridge-Nelson, exponential smoothing, moving average) |
-| [`ik_forecast_eval()`](https://charlescoverdale.github.io/inflationkit/reference/ik_forecast_eval.md)     | Forecast evaluation (Mincer-Zarnowitz bias, Nordhaus efficiency, Diebold-Mariano)     |
-| [`ik_compare()`](https://charlescoverdale.github.io/inflationkit/reference/ik_compare.md)                 | Compare multiple core inflation measures side by side                                 |
-| [`ik_sample_data()`](https://charlescoverdale.github.io/inflationkit/reference/ik_sample_data.md)         | Built-in sample CPI and macro data for examples                                       |
+| Function | Description |
+|----|----|
+| [`ik_decompose()`](https://charlescoverdale.github.io/inflationkit/reference/ik_decompose.md) | Weighted contributions of CPI components to headline inflation |
+| [`ik_core()`](https://charlescoverdale.github.io/inflationkit/reference/ik_core.md) | Core inflation (trimmed mean, weighted median, exclusion, asymmetric trim) |
+| [`ik_sticky_flexible()`](https://charlescoverdale.github.io/inflationkit/reference/ik_sticky_flexible.md) | Sticky vs flexible price decomposition (Atlanta Fed methodology) |
+| [`ik_persistence()`](https://charlescoverdale.github.io/inflationkit/reference/ik_persistence.md) | Inflation persistence (sum of AR coefficients, half-life, largest root) |
+| [`ik_diffusion()`](https://charlescoverdale.github.io/inflationkit/reference/ik_diffusion.md) | Diffusion index (fraction of items with rising prices) |
+| [`ik_phillips()`](https://charlescoverdale.github.io/inflationkit/reference/ik_phillips.md) | Phillips curve estimation (traditional, expectations-augmented, hybrid) |
+| [`ik_breakeven()`](https://charlescoverdale.github.io/inflationkit/reference/ik_breakeven.md) | Breakeven inflation from nominal and real bond yields |
+| [`ik_trend()`](https://charlescoverdale.github.io/inflationkit/reference/ik_trend.md) | Trend extraction (HP filter, Beveridge-Nelson, exponential smoothing, moving average) |
+| [`ik_forecast_eval()`](https://charlescoverdale.github.io/inflationkit/reference/ik_forecast_eval.md) | Forecast evaluation (Mincer-Zarnowitz bias, Nordhaus efficiency, Diebold-Mariano) |
+| [`ik_compare()`](https://charlescoverdale.github.io/inflationkit/reference/ik_compare.md) | Compare multiple core inflation measures side by side |
+| [`ik_sample_data()`](https://charlescoverdale.github.io/inflationkit/reference/ik_sample_data.md) | Built-in sample CPI and macro data for examples |
 
 All functions return S3 objects with
 [`print()`](https://rdrr.io/r/base/print.html) and
@@ -327,12 +339,15 @@ The methods implemented in this package are based on:
 
 ## Related packages
 
-| Package                                                  | Description                                           |
-|----------------------------------------------------------|-------------------------------------------------------|
-| [inflateR](https://github.com/charlescoverdale/inflateR) | Adjust monetary values for inflation                  |
-| [ons](https://github.com/charlescoverdale/ons)           | UK Office for National Statistics data (includes CPI) |
-| [fred](https://github.com/charlescoverdale/fred)         | Federal Reserve Economic Data (includes US CPI)       |
-| [readecb](https://github.com/charlescoverdale/readecb)   | European Central Bank data (includes HICP)            |
+| Package | Description |
+|----|----|
+| [inflateR](https://github.com/charlescoverdale/inflateR) | Adjust monetary values for inflation (simpler companion) |
+| [ons](https://github.com/charlescoverdale/ons) | UK Office for National Statistics data (CPI, RPI, GDP deflator) |
+| [fred](https://github.com/charlescoverdale/fred) | Federal Reserve Economic Data (includes US CPI) |
+| [readecb](https://github.com/charlescoverdale/readecb) | European Central Bank data (includes HICP) |
+| [readoecd](https://github.com/charlescoverdale/readoecd) | OECD international price data |
+| [nowcast](https://github.com/charlescoverdale/nowcast) | Economic nowcasting (inflation nowcasts) |
+| [mpshock](https://github.com/charlescoverdale/mpshock) | Monetary policy shock series |
 
 ## Issues
 
