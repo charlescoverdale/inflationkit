@@ -302,10 +302,13 @@ The methods implemented in this package are based on:
 
 | Package | Description |
 |---------|-------------|
-| [inflateR](https://github.com/charlescoverdale/inflateR) | Adjust monetary values for inflation |
-| [ons](https://github.com/charlescoverdale/ons) | UK Office for National Statistics data (includes CPI) |
+| [inflateR](https://github.com/charlescoverdale/inflateR) | Adjust monetary values for inflation (simpler companion) |
+| [ons](https://github.com/charlescoverdale/ons) | UK Office for National Statistics data (CPI, RPI, GDP deflator) |
 | [fred](https://github.com/charlescoverdale/fred) | Federal Reserve Economic Data (includes US CPI) |
 | [readecb](https://github.com/charlescoverdale/readecb) | European Central Bank data (includes HICP) |
+| [readoecd](https://github.com/charlescoverdale/readoecd) | OECD international price data |
+| [nowcast](https://github.com/charlescoverdale/nowcast) | Economic nowcasting (inflation nowcasts) |
+| [mpshock](https://github.com/charlescoverdale/mpshock) | Monetary policy shock series |
 
 
 ## Issues
