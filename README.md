@@ -8,6 +8,8 @@
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 <!-- badges: end -->
 
+A technical working paper for this package can be found [here](https://charlescoverdale.github.io/files/coverdale_inflationkit_2026.pdf).
+
 An R package for inflation analysis. Decompose headline inflation into component contributions, compute core measures (trimmed mean, weighted median, exclusion-based), estimate how persistent inflation is, fit Phillips curves, and extract the underlying trend from noisy price data.
 
 ## Installation
