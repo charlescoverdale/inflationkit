@@ -344,14 +344,15 @@ $p$-value for equal predictive accuracy.
 
 Figure \ref{fig:mz} shows a Mincer-Zarnowitz scatter for a naive
 AR(1)-with-drift forecast against realised headline inflation.
-The estimated slope is well below one and the test rejects the joint
-null at any conventional level: the forecast is biased, under-
-reacting to the pandemic spike as it occurred.
+The estimated slope is 1.62, well above one, and the test rejects
+the joint null at any conventional level: the forecast is biased and
+under-reacts, moving too little relative to realised inflation as
+the pandemic spike occurred.
 
 \begin{figure}[tbp]
 \centering
 \includegraphics[width=\linewidth]{figures/fig5_mz.pdf}
-\caption{\textbf{Mincer-Zarnowitz scatter of realised inflation against a naive forecast on 120 months of synthetic data.} Dashed line is the 45 degree line of perfect forecasting. Red line is the fitted Mincer-Zarnowitz regression with 95 per cent pointwise band. The slope estimate falls well short of unity and the intercept deviates from zero, indicating both bias (intercept) and under-reaction (slope).}
+\caption{\textbf{Mincer-Zarnowitz scatter of realised inflation against a naive forecast on 120 months of synthetic data.} Dashed line is the 45 degree line of perfect forecasting. Red line is the fitted Mincer-Zarnowitz regression with 95 per cent pointwise band. The slope estimate of 1.62 exceeds unity and the intercept deviates from zero, indicating both bias (intercept) and under-reaction (slope): realised inflation moves more than one-for-one with the forecast, so the forecast responds too little.}
 \label{fig:mz}
 \end{figure}
 

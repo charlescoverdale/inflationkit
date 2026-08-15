@@ -3,46 +3,44 @@ Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
 The top-level auxiliary file: RJwrapper.aux
 The style file: abbrvnat.bst
 Database file #1: RJreferences.bib
-Warning--there's a number but no volume in reis2022burst
 You've used 19 entries,
             2773 wiz_defined-function locations,
-            742 strings with 8008 characters,
-and the built_in function-call counts, 8749 in all, are:
-= -- 858
-> -- 372
-< -- 22
-+ -- 127
-- -- 108
+            743 strings with 8022 characters,
+and the built_in function-call counts, 8776 in all, are:
+= -- 861
+> -- 376
+< -- 23
++ -- 128
+- -- 109
 * -- 691
-:= -- 1334
+:= -- 1343
 add.period$ -- 74
 call.type$ -- 19
 change.case$ -- 92
 chr.to.int$ -- 19
-cite$ -- 39
-duplicate$ -- 404
-empty$ -- 757
-format.name$ -- 149
-if$ -- 1851
+cite$ -- 38
+duplicate$ -- 405
+empty$ -- 758
+format.name$ -- 150
+if$ -- 1857
 int.to.chr$ -- 1
 int.to.str$ -- 1
-missing$ -- 18
-newline$ -- 118
-num.names$ -- 80
-pop$ -- 147
+missing$ -- 17
+newline$ -- 117
+num.names$ -- 82
+pop$ -- 148
 preamble$ -- 1
 purify$ -- 73
 quote$ -- 0
-skip$ -- 307
+skip$ -- 305
 stack$ -- 0
 substring$ -- 449
 swap$ -- 39
-text.length$ -- 5
+text.length$ -- 6
 text.prefix$ -- 0
 top$ -- 0
 type$ -- 209
-warning$ -- 1
-while$ -- 96
+warning$ -- 0
+while$ -- 97
 width$ -- 0
 write$ -- 288
-(There was 1 warning)
