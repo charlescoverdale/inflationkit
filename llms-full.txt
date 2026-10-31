@@ -2,7 +2,7 @@
 
 > Tools for analysing inflation dynamics.
 
-- Version: 0.1.0
+- Version: 0.1.1
 - Install: `install.packages("inflationkit")`
 - CRAN: https://CRAN.R-project.org/package=inflationkit
 - GitHub: https://github.com/charlescoverdale/inflationkit

@@ -31,7 +31,7 @@ ik_sample_data <- function(type = c("components", "headline")) {
 
 #' @noRd
 .sample_components <- function() {
-  set.seed(42L)
+  .local_seed(42L)
 
   items <- c(
     "Food", "Housing", "Transport", "Clothing", "Health",
@@ -77,7 +77,7 @@ ik_sample_data <- function(type = c("components", "headline")) {
 
 #' @noRd
 .sample_headline <- function() {
-  set.seed(42L)
+  .local_seed(42L)
 
   n_quarters <- 80L
   dates <- seq.Date(

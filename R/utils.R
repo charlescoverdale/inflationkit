@@ -102,3 +102,28 @@ fmt_pct <- function(x) {
 fmt_pp <- function(x) {
   paste0(round(x * 100, 2), " pp")
 }
+
+# Set the RNG seed for the duration of the calling function only, restoring the
+# caller's .Random.seed on exit. ik_sample_data() needs a fixed seed so its
+# demonstration data are reproducible, but it should not leave the caller's
+# random stream reseeded: every later draw in the session would otherwise be
+# silently reset to the same sequence.
+#
+# Touching globalenv() is unavoidable: .Random.seed lives there by
+# definition. This restores the caller's state rather than adding to it.
+.local_seed <- function(seed, frame = parent.frame()) {
+  had_seed <- exists(".Random.seed", envir = globalenv(), inherits = FALSE)
+  restore <- if (had_seed) {
+    old <- get(".Random.seed", envir = globalenv(), inherits = FALSE)
+    substitute(
+      assign(".Random.seed", value, envir = globalenv()),
+      list(value = old)
+    )
+  } else {
+    # No stream existed before the call, so leave none behind.
+    quote(suppressWarnings(rm(".Random.seed", envir = globalenv())))
+  }
+  do.call(on.exit, list(restore, add = TRUE, after = FALSE), envir = frame)
+  set.seed(seed)
+  invisible(NULL)
+}

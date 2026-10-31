@@ -11,6 +11,7 @@ Tools for analysing inflation dynamics. Computes weighted contributions of price
 \seealso{
 Useful links:
 \itemize{
+  \item \url{https://charlescoverdale.github.io/inflationkit/}
   \item \url{https://github.com/charlescoverdale/inflationkit}
   \item Report bugs at \url{https://github.com/charlescoverdale/inflationkit/issues}
 }
@@ -18,6 +19,11 @@ Useful links:
 }
 \author{
 \strong{Maintainer}: Charles Coverdale \email{charlesfcoverdale@gmail.com}
+
+Authors:
+\itemize{
+  \item Charles Coverdale \email{charlesfcoverdale@gmail.com}
+}
 
 }
 \keyword{internal}

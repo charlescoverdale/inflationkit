@@ -94,3 +94,22 @@ test_that("ik_sample_data default type is 'components'", {
   comp <- ik_sample_data()
   expect_equal(nrow(comp), 1200L)
 })
+
+test_that("ik_sample_data('headline') does not alter global RNG state", {
+  set.seed(7)
+  r1 <- runif(1)
+  set.seed(7)
+  ik_sample_data("headline")
+  r2 <- runif(1)
+  expect_equal(r1, r2)
+})
+
+test_that("ik_sample_data leaves no RNG state when there was none", {
+  if (exists(".Random.seed", envir = globalenv())) {
+    old <- get(".Random.seed", envir = globalenv())
+    on.exit(assign(".Random.seed", old, envir = globalenv()), add = TRUE)
+    rm(".Random.seed", envir = globalenv())
+  }
+  ik_sample_data("components")
+  expect_false(exists(".Random.seed", envir = globalenv()))
+})

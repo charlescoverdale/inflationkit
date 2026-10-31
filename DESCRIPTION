@@ -1,6 +1,6 @@
 Package: inflationkit
 Title: Inflation Decomposition, Core Measures, and Trend Estimation
-Version: 0.1.0
+Version: 0.1.1
 Authors@R:
     person("Charles", "Coverdale", , "charlesfcoverdale@gmail.com", role = c("aut", "cre"))
 Description: Tools for analysing inflation dynamics. Computes weighted
@@ -17,7 +17,6 @@ License: MIT + file LICENSE
 Encoding: UTF-8
 Language: en-US
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.3
 Imports:
     cli (>= 3.6.0),
     grDevices,
@@ -28,3 +27,4 @@ Suggests:
 Config/testthat/edition: 3
 URL: https://charlescoverdale.github.io/inflationkit/, https://github.com/charlescoverdale/inflationkit
 BugReports: https://github.com/charlescoverdale/inflationkit/issues
+Config/roxygen2/version: 8.1.0
