@@ -96,7 +96,7 @@ print(tr)
 #> 
 #> ── Trend Inflation ─────────────────────────────────────────────────────────────
 #> • Method: Hodrick-Prescott (lambda = 1600)
-#> • Mean trend: 1.5261
+#> • Mean trend: 1.526
 #> • Cycle volatility (SD): 0.3405
 #> • Observations: 80
 plot(tr)

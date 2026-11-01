@@ -13,6 +13,8 @@ source.
 
 Useful links:
 
+- <https://charlescoverdale.github.io/inflationkit/>
+
 - <https://github.com/charlescoverdale/inflationkit>
 
 - Report bugs at
@@ -21,3 +23,7 @@ Useful links:
 ## Author
 
 **Maintainer**: Charles Coverdale <charlesfcoverdale@gmail.com>
+
+Authors:
+
+- Charles Coverdale <charlesfcoverdale@gmail.com>

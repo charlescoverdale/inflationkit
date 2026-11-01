@@ -92,10 +92,10 @@ print(bias)
 #> 
 #> ── Forecast Evaluation ─────────────────────────────────────────────────────────
 #> • Test: Mincer-Zarnowitz Bias Test
-#> • Test statistic: 19.5379
+#> • Test statistic: 20.0156
 #> • p-value: 0
 #> • Reject H0: forecasts appear biased (alpha != 0 or beta != 1).
-#> • Coefficients: alpha = 0.7846, beta = 0.4673
+#> • Coefficients: alpha = 0.8062, beta = 0.4524
 
 # Diebold-Mariano test
 dm <- ik_forecast_eval(actual, forecast1, test = "dm", forecast2 = forecast2)
@@ -103,8 +103,8 @@ print(dm)
 #> 
 #> ── Forecast Evaluation ─────────────────────────────────────────────────────────
 #> • Test: Diebold-Mariano Test
-#> • Test statistic: -3.3516
-#> • p-value: 8e-04
-#> • Forecast 1 is significantly more accurate than Forecast 2.
-#> • Coefficients: mean_loss_diff = -0.126
+#> • Test statistic: -1.3703
+#> • p-value: 0.1706
+#> • No significant difference in predictive accuracy between the two forecasts.
+#> • Coefficients: mean_loss_diff = -0.0547
 ```

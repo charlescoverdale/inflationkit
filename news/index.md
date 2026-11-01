@@ -1,5 +1,18 @@
 # Changelog
 
+## inflationkit 0.1.1
+
+Patch release. One fix, to a side effect rather than to any returned
+value.
+
+[`ik_sample_data()`](https://charlescoverdale.github.io/inflationkit/reference/ik_sample_data.md)
+called `set.seed(42L)` and did not restore the previous state, so
+calling it reseeded the caller’s random stream: every later random draw
+in the session was silently reset to a fixed sequence. The package’s own
+test for this was failing. The seed now applies for the duration of the
+call only, and `.Random.seed` is restored on exit (or removed, if the
+session had none). The generated data are unchanged.
+
 ## inflationkit 0.1.0
 
 CRAN release: 2026-03-26

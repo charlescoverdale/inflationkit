@@ -26,10 +26,10 @@ library(inflationkit)
 # Built-in sample data: 10 CPI components, 120 months
 d <- ik_sample_data("components")
 head(d)
-#>         date    item weight price_change
-#> 1 2015-01-01    Food   0.15     0.003218
-#> 2 2015-01-01 Housing   0.25     0.004274
-#> 3 2015-01-01 Transport 0.12    0.001893
+#>        date item weight price_change
+#>  2015-01-01 Food   0.15     0.008484
+#>  2015-02-01 Food   0.15     0.000741
+#>  2015-03-01 Food   0.15     0.004453
 #> ...
 
 # What is driving inflation?
@@ -68,10 +68,10 @@ component. This tells you how many percentage points each category
 d <- ik_sample_data("components")
 decomp <- ik_decompose(d)
 decomp
-#> -- Inflation Decomposition --
+#> -- Inflation Decomposition -----------------------------------------------------
 #> * Period: 2015-01-01 to 2024-12-01
 #> * Number of items: 10
-#> * Mean headline inflation: 0.25%
+#> * Mean headline inflation: 0.26%
 
 plot(decomp)  # Stacked bar chart of contributions over time
 ```
@@ -117,16 +117,20 @@ d <- ik_sample_data("headline")
 
 pers <- ik_persistence(d$inflation, method = "sum_ar")
 pers
-#> -- Inflation Persistence (Sum of AR Coefficients) --
-#> * AR order: 4 (selected by BIC)
-#> * Persistence value: 0.72
+#> -- Inflation Persistence -------------------------------------------------------
+#> * Method: Sum of AR Coefficients
+#> * AR order: 1
+#> * Persistence value: 0.647
 #> * Moderate persistence (sum of AR coefficients 0.5 to 0.8)
 
 # Half-life: how many quarters until a shock decays by half?
 pers_hl <- ik_persistence(d$inflation, method = "half_life")
 pers_hl
-#> -- Inflation Persistence (Half-Life) --
-#> * Persistence value: 3.2 periods
+#> -- Inflation Persistence -------------------------------------------------------
+#> * Method: Half-Life
+#> * AR order: 1
+#> * Persistence value: 1.592
+#> * Low persistence (half-life < 4 periods)
 ```
 
 ### Is there a Phillips curve?
@@ -140,9 +144,10 @@ d <- ik_sample_data("headline")
 
 pc <- ik_phillips(d$inflation, d$unemployment, type = "traditional", lags = 4)
 pc
-#> -- Phillips Curve (Traditional) --
-#> * Slope estimate: -0.12 (p = 0.03)
-#> * R-squared: 0.45
+#> -- Phillips Curve Estimation ---------------------------------------------------
+#> * Type: Traditional
+#> * Slope estimate: -0.1475 (p = 0.0801) *
+#> * R-squared: 0.4342
 #> * Observations: 76
 
 # Robust standard errors (Newey-West HAC)
@@ -163,10 +168,11 @@ d <- ik_sample_data("headline")
 
 hp <- ik_trend(d$inflation, method = "hp")
 hp
-#> -- Trend Inflation (Hodrick-Prescott) --
-#> * Lambda: 1600
-#> * Mean trend: 2.8
-#> * Cycle volatility (SD): 0.5
+#> -- Trend Inflation -------------------------------------------------------------
+#> * Method: Hodrick-Prescott (lambda = 1600)
+#> * Mean trend: 1.526
+#> * Cycle volatility (SD): 0.3405
+#> * Observations: 80
 
 plot(hp)  # Original series with trend overlay
 
@@ -189,16 +195,22 @@ forecast2 <- c(1.8, 2.0, 2.6, 2.3, 2.4, 3.2, 2.5, 2.1)
 # Bias test
 bias <- ik_forecast_eval(actual, forecast1, test = "bias")
 bias
-#> -- Forecast Evaluation (Mincer-Zarnowitz Bias Test) --
-#> * p-value: 0.42
-#> * Cannot reject H0: no evidence of forecast bias.
+#> -- Forecast Evaluation ---------------------------------------------------------
+#> * Test: Mincer-Zarnowitz Bias Test
+#> * Test statistic: 18.8543
+#> * p-value: 0.0026
+#> * Reject H0: forecasts appear biased (alpha != 0 or beta != 1).
+#> * Coefficients: alpha = -0.179, beta = 1.14
 
 # Diebold-Mariano: is forecast1 better than forecast2?
 dm <- ik_forecast_eval(actual, forecast1, test = "dm", forecast2 = forecast2)
 dm
-#> -- Forecast Evaluation (Diebold-Mariano Test) --
-#> * p-value: 0.08
-#> * No significant difference in predictive accuracy.
+#> -- Forecast Evaluation ---------------------------------------------------------
+#> * Test: Diebold-Mariano Test
+#> * Test statistic: -2.6306
+#> * p-value: 0.0085
+#> * Forecast 1 is significantly more accurate than Forecast 2.
+#> * Coefficients: mean_loss_diff = -0.0387
 ```
 
 ## What data do I need?
@@ -241,16 +253,24 @@ library(inflationkit)
 # Component-level data: 10 CPI items, 120 months
 d <- ik_sample_data("components")
 head(d)
-#>         date    item weight price_change
-#> 1 2015-01-01    Food   0.15     0.003218
-#> 2 2015-01-01 Housing   0.25     0.004274
-#> 3 2015-01-01 Transport 0.12    0.001893
+#>        date item weight price_change
+#>  2015-01-01 Food   0.15     0.008484
+#>  2015-02-01 Food   0.15     0.000741
+#>  2015-03-01 Food   0.15     0.004453
+#>  2015-04-01 Food   0.15     0.005531
+#>  2015-05-01 Food   0.15     0.004617
+#>  2015-06-01 Food   0.15     0.002576
 
 # Headline data: monthly inflation + unemployment
 h <- ik_sample_data("headline")
 head(h)
-#>         date inflation unemployment
-#> 1 2015-01-01    0.0025         0.055
+#>        date inflation output_gap unemployment
+#>  2005-01-01     2.500      0.000        5.500
+#>  2005-04-01     2.275      0.685        5.056
+#>  2005-07-01     1.963      0.796        5.303
+#>  2005-10-01     2.466      1.313        4.946
+#>  2006-01-01     2.760      0.888        5.536
+#>  2006-04-01     2.224     -0.073        5.446
 ```
 
 ### Option 2: Pull UK CPI data from the ONS
